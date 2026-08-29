@@ -1,273 +1,338 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Желание сквозь Вселенную - персональное сообщение, преобразованное в цифровой сигнал и подготовленное к отправке в космос.">
-  <meta name="theme-color" content="#111111">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#05070c">
+  <meta name="description" content="Желание сквозь Вселенную: персональное послание, EEG-отпечаток и цифровой сигнал для будущего сеанса космической радиопередачи.">
   <title>Желание сквозь Вселенную</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="wrap topbar__inner">
+  <div class="page-noise" aria-hidden="true"></div>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
       <a class="brand" href="#top" aria-label="Желание сквозь Вселенную">
-        <span class="brand__dot" aria-hidden="true"></span>
-        <span>JELANIE / SIGNAL 001</span>
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="21" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".35"/>
+            <path d="M11 30c6 9 18 12 28 6M18 31l17-17M16 24c7 0 13 3 17 8-5 5-11 7-17 7-3-5-3-10 0-15Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <circle cx="38" cy="11" r="2.5" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <strong>ЖЕЛАНИЕ</strong>
+          <span>СКВОЗЬ ВСЕЛЕННУЮ</span>
+        </span>
       </a>
 
-      <nav class="nav" aria-label="Навигация">
+      <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="main-nav" aria-label="Основная навигация">
         <a href="#how">Как это работает</a>
-        <a href="#result">Что получите</a>
-        <a href="#faq">Вопросы</a>
+        <a href="#formats">Форматы</a>
+        <a href="#technology">Передатчик</a>
+        <a href="#certificate">Сертификат</a>
+        <a href="#faq">FAQ</a>
       </nav>
 
-      <a class="mini-cta" href="#request">Оставить заявку</a>
+      <button class="button button-small button-gradient js-open-builder" type="button">Отправить желание</button>
     </div>
   </header>
 
-  <main id="top">
-    <section class="hero">
-      <div class="wrap hero__grid">
-        <div>
-          <p class="eyebrow">Персональный сигнал в открытый космос</p>
-          <h1>
-            <span>Желание</span>
-            <span class="accent">сквозь</span>
-            <span>Вселенную</span>
-          </h1>
+  <main>
+    <section class="hero section-shell">
+      <div class="star-field" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
 
-          <div class="hero__copy">
-            <div>
-              <p class="hero__text">
-                Зафиксируйте желание. Мы преобразуем его в цифровой код и подготовим к передаче радиосигналом в открытый космос. После запуска вы получите персональный сертификат с параметрами отправки.
-              </p>
-              <div class="hero__actions">
-                <a class="btn btn--dark" href="#request">Стать участником</a>
-                <a class="btn btn--light" href="#how">Как это работает</a>
-              </div>
-            </div>
-            <div class="hero__code">
-              MVP 01<br>
-              PRIVATE MESSAGE<br>
-              DIGITAL ENCODING<br>
-              RADIO TRANSMISSION
-            </div>
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <div class="eyebrow"><span></span> Технологический ритуал нового времени</div>
+          <h1>Ваше желание<br>покидает Землю</h1>
+          <p class="hero-lead">Мы превращаем ваше послание и EEG-отпечаток момента в уникальный цифровой сигнал для включения в будущий сеанс космической радиопередачи.</p>
+          <div class="hero-actions">
+            <button class="button button-gradient js-open-builder" type="button">Создать сигнал</button>
+            <a class="button button-ghost" href="#how"><span class="play-icon" aria-hidden="true">▶</span> Как это работает</a>
+          </div>
+          <div class="transmission-status" aria-label="Статус проекта">
+            <span class="status-pulse"></span>
+            <span><strong>Статус:</strong> формируется первый пакет</span>
+            <span class="status-divider"></span>
+            <span>Планируемая антенна: РТ-64</span>
           </div>
         </div>
 
-        <aside class="signal-card" aria-label="Визуализация сигнала">
-          <div class="signal-card__top">
-            <span>PERSONAL SIGNAL</span>
-            <span>01 / ∞</span>
-          </div>
-          <div class="orbit" aria-hidden="true"></div>
-          <div class="signal-core">YOUR<br>SIGNAL</div>
-          <div class="signal-card__bottom">
-            <span>CODED<br>MESSAGE</span>
-            <strong>∞</strong>
-          </div>
-        </aside>
+        <div class="hero-visual reveal" aria-hidden="true">
+          <div class="space-orb"></div>
+          <svg class="dish-illustration" viewBox="0 0 720 620">
+            <defs>
+              <linearGradient id="dishFill" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0" stop-color="#dfe8ff" stop-opacity=".78"/>
+                <stop offset=".45" stop-color="#65799d" stop-opacity=".5"/>
+                <stop offset="1" stop-color="#111a2d" stop-opacity=".25"/>
+              </linearGradient>
+              <linearGradient id="beamFill" x1="0" x2="1">
+                <stop offset="0" stop-color="#6de9ff" stop-opacity=".85"/>
+                <stop offset="1" stop-color="#8e73ff" stop-opacity="0"/>
+              </linearGradient>
+              <filter id="blueGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="9" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <g opacity=".22" stroke="#8bb9e8" fill="none">
+              <circle cx="558" cy="115" r="34"/>
+              <circle cx="558" cy="115" r="62"/>
+              <circle cx="558" cy="115" r="94"/>
+            </g>
+            <path d="M392 235 560 115" stroke="url(#beamFill)" stroke-width="7" filter="url(#blueGlow)"/>
+            <circle cx="558" cy="115" r="4.5" fill="#dffcff" filter="url(#blueGlow)"/>
+            <g transform="translate(10 38) rotate(-8 360 320)">
+              <ellipse cx="360" cy="280" rx="196" ry="82" fill="url(#dishFill)" stroke="#9cb4d7" stroke-opacity=".55" stroke-width="2"/>
+              <path d="M169 280c91 41 278 41 382 0" fill="none" stroke="#d6e5ff" stroke-opacity=".22"/>
+              <path d="M360 280 265 492M360 280l85 212M265 492h180" fill="none" stroke="#7286a8" stroke-width="13" stroke-linecap="round"/>
+              <path d="M302 404h119M285 445h142" stroke="#3d4e6b" stroke-width="9" stroke-linecap="round"/>
+              <path d="M360 280v-93M360 188l45-36M360 188l-43-35" fill="none" stroke="#a9bad4" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="360" cy="185" r="9" fill="#d9f4ff" filter="url(#blueGlow)"/>
+              <path d="M265 492 210 548M445 492l59 56M205 549h306" fill="none" stroke="#27344d" stroke-width="16" stroke-linecap="round"/>
+              <path d="M294 248 360 188l64 58M236 269l124-81 128 80" fill="none" stroke="#a7b9d5" stroke-opacity=".55" stroke-width="3"/>
+            </g>
+          </svg>
+          <div class="signal-ring ring-one"></div>
+          <div class="signal-ring ring-two"></div>
+          <div class="signal-ring ring-three"></div>
+        </div>
+      </div>
+
+      <div class="container trust-strip reveal">
+        <article class="trust-item">
+          <span class="trust-icon">◉</span>
+          <div><strong>Радиопередача</strong><span>Пакет готовится для подтвержденного сеанса дальней связи</span></div>
+        </article>
+        <article class="trust-item">
+          <span class="trust-icon">✦</span>
+          <div><strong>Выбор звезды</strong><span>Вы выбираете направление, расстояние и смысл цели</span></div>
+        </article>
+        <article class="trust-item">
+          <span class="trust-icon">✓</span>
+          <div><strong>Проверяемый сертификат</strong><span>ID, координаты цели, дата, параметры и цифровой хеш</span></div>
+        </article>
+        <article class="trust-item">
+          <span class="trust-icon">∞</span>
+          <div><strong>Общий космический сеанс</strong><span>Персональные сигналы объединяются в один пакет передачи</span></div>
+        </article>
       </div>
     </section>
 
-    <section class="section" id="how">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="section-index">01 / PROCESS</div>
-          <h2>Четыре шага от мысли до сигнала</h2>
+    <section class="section section-dark" id="how">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="section-kicker">Пять понятных шагов</span>
+          <h2>Как это работает</h2>
+          <p>От личной мысли до зафиксированного цифрового пакета, готового к включению в радиосеанс.</p>
         </div>
 
-        <div class="steps">
-          <article class="step">
-            <span class="step__num">01</span>
-            <div>
-              <h3>Сформулируйте</h3>
-              <p>Оставьте желание текстом или передайте только его смысл. Текст можно сохранить полностью приватным.</p>
-            </div>
-          </article>
-
-          <article class="step">
-            <span class="step__num">02</span>
-            <div>
-              <h3>Закодируем</h3>
-              <p>Сообщение преобразуется в цифровую последовательность, пригодную для формирования радиосигнала.</p>
-            </div>
-          </article>
-
-          <article class="step">
-            <span class="step__num">03</span>
-            <div>
-              <h3>Передадим</h3>
-              <p>Сигнал включается в программу запуска. Точные технические параметры фиксируются после подтверждения сеанса.</p>
-            </div>
-          </article>
-
-          <article class="step">
-            <span class="step__num">04</span>
-            <div>
-              <h3>Зафиксируем</h3>
-              <p>Вы получите сертификат с датой, временем, кодом сообщения и параметрами фактической передачи.</p>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="result">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="section-index">02 / MEANING</div>
-          <h2>Не обещание чуда. Реальный технологический ритуал.</h2>
-        </div>
-
-        <div class="manifest">
-          <div class="manifest__main">
-            <p>JELANIE / MANIFEST</p>
-            <blockquote>
-              У желания появляется точная дата, цифровой код и момент, когда оно покидает Землю.
-            </blockquote>
-          </div>
-
-          <div class="manifest__side">
-            <h3>Что получает участник</h3>
-            <p>
-              Проект не обещает физического исполнения желания. Его ценность в другом: личная мысль превращается в зафиксированное сообщение и получает технологически подтвержденный момент отправки.
-            </p>
-
-            <div class="deliverables">
-              <div class="deliverable">
-                <strong>Сертификат</strong>
-                <span>Именной цифровой документ после подтвержденной передачи.</span>
-              </div>
-              <div class="deliverable">
-                <strong>Дата и время</strong>
-                <span>Точный момент отправки вашего сообщения.</span>
-              </div>
-              <div class="deliverable">
-                <strong>Код сигнала</strong>
-                <span>Уникальный идентификатор цифрового сообщения.</span>
-              </div>
-              <div class="deliverable">
-                <strong>Параметры запуска</strong>
-                <span>Технические данные, которые можно проверить и сохранить.</span>
-              </div>
-            </div>
-          </div>
+        <div class="process reveal">
+          <article class="process-step"><span class="step-number">01</span><span class="process-symbol">✎</span><h3>Формулировка</h3><p>Вы вводите желание, послание или мысль, которую хотите сохранить.</p></article>
+          <span class="process-line" aria-hidden="true"></span>
+          <article class="process-step"><span class="step-number">02</span><span class="process-symbol">⌁</span><h3>EEG-сеанс</h3><p>Гарнитура фиксирует характеристики состояния в момент концентрации.</p></article>
+          <span class="process-line" aria-hidden="true"></span>
+          <article class="process-step"><span class="step-number">03</span><span class="process-symbol">0101</span><h3>Кодирование</h3><p>Текст, EEG, время и цель объединяются в пакет Universe ID.</p></article>
+          <span class="process-line" aria-hidden="true"></span>
+          <article class="process-step"><span class="step-number">04</span><span class="process-symbol">⌁</span><h3>Радиосеанс</h3><p>После подтверждения оператора пакет включается в направленную передачу.</p></article>
+          <span class="process-line" aria-hidden="true"></span>
+          <article class="process-step"><span class="step-number">05</span><span class="process-symbol">✦</span><h3>Подтверждение</h3><p>После сеанса вы получаете сертификат и страницу проверки.</p></article>
         </div>
       </div>
     </section>
 
-    <section class="section" id="request">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="section-index">03 / FIRST LAUNCH</div>
-          <h2>Попасть в первый список участников</h2>
+    <section class="section" id="formats">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="section-kicker">Форматы участия</span>
+          <h2>Выберите свой уровень сигнала</h2>
+          <p>На этапе MVP оплата не списывается. Вы создаете предварительный пакет и оставляете заявку на участие.</p>
         </div>
 
-        <div class="launch">
-          <div class="launch__offer">
-            <div class="launch__offer-top">
-              <span>PRE-LAUNCH</span>
-              <span>MVP / 2026</span>
-            </div>
+        <div class="pricing-grid reveal">
+          <article class="price-card">
+            <div><span class="price-label">SIGNAL</span><h3>1 490 ₽</h3><p>Базовое участие в общей передаче.</p></div>
+            <ul><li>Текст послания</li><li>EEG-отпечаток</li><li>Universe ID</li><li>Цифровой сертификат</li></ul>
+            <button class="button button-outline js-package" type="button" data-package="signal">Выбрать</button>
+          </article>
 
-            <div>
-              <span class="launch__tag">Первый запуск</span>
-              <h3>Ваш<br>сигнал</h3>
-              <p>
-                Сейчас мы формируем список участников пилотного запуска. Стоимость, дата сеанса и подтвержденный передатчик будут зафиксированы до оплаты и отправки сигнала.
-              </p>
-            </div>
+          <article class="price-card featured">
+            <span class="popular-tag">Популярный</span>
+            <div><span class="price-label">PERSONAL</span><h3>2 990 ₽</h3><p>Расширенный персональный опыт.</p></div>
+            <ul><li>Все из SIGNAL</li><li>Выбор космической цели</li><li>Визуализация EEG</li><li>Расширенный сертификат</li></ul>
+            <button class="button button-gradient js-package" type="button" data-package="personal">Выбрать</button>
+          </article>
+
+          <article class="price-card">
+            <div><span class="price-label">DEEP SPACE</span><h3>7 990 ₽</h3><p>Премиальная версия и физический артефакт.</p></div>
+            <ul><li>Все из PERSONAL</li><li>Индивидуальный пакет</li><li>Физический сертификат</li><li>Имя в реестре участников</li></ul>
+            <button class="button button-outline js-package" type="button" data-package="deep">Выбрать</button>
+          </article>
+        </div>
+        <p class="pricing-note reveal">Указанные цены используются для тестирования спроса и будут подтверждены до приема оплаты.</p>
+      </div>
+    </section>
+
+    <section class="section technology-section" id="technology">
+      <div class="container technology-grid">
+        <div class="technology-copy reveal">
+          <span class="section-kicker">Настоящая технология</span>
+          <h2>Сигнал планируется передавать через антенну дальней космической связи</h2>
+          <p>Для первой передачи рассматривается российский радиокомплекс класса РТ-64. Конкретная площадка, дата, частота и режим передачи появятся на сайте только после письменного подтверждения технического оператора.</p>
+          <div class="tech-list">
+            <div><span>01</span><p><strong>Диаметр класса 64 м</strong><small>Высоконаправленная антенна дальней связи</small></p></div>
+            <div><span>02</span><p><strong>Точные небесные координаты</strong><small>Цель фиксируется в формате RA / DEC</small></p></div>
+            <div><span>03</span><p><strong>Журнал технической операции</strong><small>Фактические параметры переносятся в сертификат</small></p></div>
           </div>
+          <button class="button button-ghost js-open-builder" type="button">Подготовить сигнал</button>
+        </div>
 
-          <div class="form-card">
-            <h3>Оставить заявку</h3>
-            <p>Заполните короткую форму. После нажатия откроется Telegram с готовым сообщением.</p>
-
-            <form id="requestForm">
-              <div class="field">
-                <label for="name">Имя</label>
-                <input id="name" name="name" autocomplete="name" placeholder="Как к вам обращаться" required>
-              </div>
-
-              <div class="field">
-                <label for="contact">Контакт</label>
-                <input id="contact" name="contact" placeholder="Telegram, телефон или e-mail" required>
-              </div>
-
-              <div class="field">
-                <label for="format">Формат участия</label>
-                <select id="format" name="format">
-                  <option>Личный сигнал</option>
-                  <option>Сигнал для двоих</option>
-                  <option>Подарочный сертификат</option>
-                  <option>Хочу узнать детали</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label for="wish">Желание или комментарий</label>
-                <textarea id="wish" name="wish" placeholder="Можно не писать само желание. Достаточно комментария к заявке."></textarea>
-              </div>
-
-              <label class="checkbox">
-                <input id="privateWish" type="checkbox" checked>
-                <span>Считать текст желания приватным и не использовать его в публичных материалах проекта.</span>
-              </label>
-
-              <button class="submit" type="submit">Сформировать заявку в Telegram</button>
-              <div class="form-note">Сообщение не отправляется автоматически. Вы увидите его в Telegram и сами подтвердите отправку.</div>
-              <div class="status" id="formStatus" role="status" aria-live="polite"></div>
-            </form>
-          </div>
+        <div class="tech-visual reveal">
+          <div class="tech-stars"></div>
+          <svg viewBox="0 0 620 450" aria-hidden="true">
+            <defs>
+              <linearGradient id="techDish" x1="0" x2="1"><stop stop-color="#dfeaff" stop-opacity=".75"/><stop offset="1" stop-color="#34415c" stop-opacity=".4"/></linearGradient>
+            </defs>
+            <ellipse cx="330" cy="185" rx="186" ry="68" fill="url(#techDish)" stroke="#9fb7dc" stroke-opacity=".5"/>
+            <path d="M330 185 244 357M330 185l78 172M243 357h166M330 185v-81M330 106l40-28M330 106l-39-28" fill="none" stroke="#7890b7" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="330" cy="104" r="8" fill="#c6f5ff"/>
+            <path d="M255 322h145M244 357l-53 56M409 357l58 56M186 415h288" fill="none" stroke="#26344c" stroke-width="13" stroke-linecap="round"/>
+          </svg>
+          <div class="tech-metrics"><div><span>Класс антенны</span><strong>РТ-64</strong></div><div><span>Статус</span><strong>Согласование</strong></div><div><span>Протокол</span><strong>Universe 1.0</strong></div></div>
         </div>
       </div>
     </section>
 
-    <section class="section" id="faq">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="section-index">04 / FAQ</div>
-          <h2>Коротко о главном</h2>
+    <section class="section" id="certificate">
+      <div class="container certificate-grid">
+        <div class="certificate-card reveal" aria-label="Пример предварительного сертификата">
+          <div class="certificate-top"><span>UNIVERSE</span><span>TRANSMISSION CERTIFICATE</span></div>
+          <div class="certificate-orbits"><i></i><i></i><i></i><b>✦</b></div>
+          <h3>ИВАН ИВАНОВ</h3>
+          <div class="certificate-data"><span>Transmission ID</span><strong>UNV-2026-000184</strong><span>Target</span><strong>HD 20794</strong><span>Status</span><strong>PREPARED</strong><span>Protocol</span><strong>Universe 1.0</strong></div>
+          <div class="certificate-bottom"><span>SHA-256 VERIFIED</span><span class="certificate-seal">DATA<br>READY</span></div>
         </div>
 
-        <div class="faq">
-          <details>
-            <summary>Это гарантирует исполнение желания?</summary>
-            <p>Нет. Проект не продает обещание исполнения. Мы создаем реальный цифровой артефакт и фиксируем технологический факт передачи сообщения.</p>
-          </details>
-
-          <details>
-            <summary>Нужно ли раскрывать текст желания?</summary>
-            <p>Нет. Сам текст можно не передавать в публичную часть проекта. Для сертификата достаточно уникального кода сообщения и параметров отправки.</p>
-          </details>
-
-          <details>
-            <summary>Какой передатчик будет использоваться?</summary>
-            <p>Параметры конкретного сеанса и передающей площадки будут указаны до оплаты. В сертификат попадут только фактически подтвержденные данные запуска.</p>
-          </details>
-
-          <details>
-            <summary>Когда пройдет первый запуск?</summary>
-            <p>Дата будет опубликована после подтверждения технического партнера и доступного окна передачи. Сейчас форма собирает предварительные заявки участников.</p>
-          </details>
+        <div class="certificate-copy reveal">
+          <span class="section-kicker">Наше подтверждение</span>
+          <h2>Сертификат с параметрами реальной передачи</h2>
+          <p>Сначала участник получает предварительный документ со статусом PREPARED. После подтвержденного радиосеанса статус меняется на TRANSMITTED, а в документ добавляются фактические данные.</p>
+          <ul class="check-list"><li>Уникальный ID сигнала</li><li>Координаты выбранной цели</li><li>Дата и время фактического сеанса</li><li>Антенна и технические параметры</li><li>SHA-256 для проверки целостности</li></ul>
+          <button class="button button-outline js-open-builder" type="button">Создать предварительный сертификат</button>
         </div>
+      </div>
+    </section>
+
+    <section class="section audience-section">
+      <div class="container">
+        <div class="section-heading compact reveal"><span class="section-kicker">Для кого это</span><h2>Личный опыт и формат для событий</h2></div>
+        <div class="audience-grid reveal">
+          <article><span>♡</span><strong>Для себя</strong><p>Зафиксировать важную мысль или начало нового этапа.</p></article>
+          <article><span>♢</span><strong>Для близких</strong><p>Необычный подарок с персональным смыслом.</p></article>
+          <article><span>□</span><strong>Для компаний</strong><p>Коллективное послание сотрудников или клиентов.</p></article>
+          <article><span>△</span><strong>Для образования</strong><p>Планетарии, музеи, университеты и научные фестивали.</p></article>
+          <article><span>∞</span><strong>Для событий</strong><p>Свадьбы, выпускные, юбилеи и памятные даты.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq-section" id="faq">
+      <div class="container faq-grid">
+        <div class="section-heading compact reveal"><span class="section-kicker">FAQ</span><h2>Коротко о главном</h2><p>Проект строится на проверяемых технических действиях, а не на обещании исполнения желания.</p></div>
+        <div class="faq reveal">
+          <details><summary>Сайт гарантирует исполнение желания?</summary><p>Нет. Ценность проекта в том, что личная мысль превращается в уникальный цифровой пакет и получает подтвержденный момент радиопередачи.</p></details>
+          <details><summary>EEG действительно читает мысли?</summary><p>Нет. Текст вводит сам человек. EEG используется как уникальная характеристика состояния в момент концентрации.</p></details>
+          <details><summary>Передача через РТ-64 уже подтверждена?</summary><p>Пока нет. РТ-64 является планируемым классом инфраструктуры. Название площадки и параметры будут опубликованы только после согласования с оператором.</p></details>
+          <details><summary>Когда потребуется оплата?</summary><p>В текущем MVP оплата не принимается. Сначала создается предварительный сигнал и заявка. Финальные условия сообщаются до любого платежа.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section">
+      <div class="container cta-card reveal">
+        <div><span class="section-kicker">Первая передача формируется</span><h2>Ваше желание может стать частью следующего космического сеанса</h2><p>Создайте предварительный сигнал за несколько минут. Оплата в MVP не требуется.</p></div>
+        <div class="cta-actions"><button class="button button-gradient js-open-builder" type="button">Отправить желание</button><button class="text-button js-open-builder" type="button" data-gift="true">Подготовить подарок</button></div>
       </div>
     </section>
   </main>
 
-  <footer>
-    <div class="wrap footer__inner">
-      <div class="footer__title">Желание<br>сквозь Вселенную</div>
-      <div class="footer__meta">
-        VERSION 1.0<br>
-        MVP / 2026<br>
-        PERSONAL SIGNAL PROJECT
-      </div>
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <a class="brand brand-footer" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="21" fill="none" stroke="currentColor" opacity=".35"/><path d="M11 30c6 9 18 12 28 6M18 31l17-17M16 24c7 0 13 3 17 8-5 5-11 7-17 7-3-5-3-10 0-15Z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="38" cy="11" r="2.5" fill="currentColor"/></svg></span><span class="brand-copy"><strong>ЖЕЛАНИЕ</strong><span>СКВОЗЬ ВСЕЛЕННУЮ</span></span></a>
+      <div class="footer-links"><div><strong>Проект</strong><a href="#how">Как работает</a><a href="#formats">Форматы</a><a href="#technology">Технология</a></div><div><strong>Информация</strong><a href="#certificate">Сертификат</a><a href="#faq">FAQ</a><button class="footer-link-button js-open-builder" type="button">Ранний доступ</button></div><div><strong>Статус</strong><span>MVP v2.0</span><span>Без приема оплаты</span><span>Партнер согласуется</span></div></div>
     </div>
+    <div class="container footer-bottom"><span>© 2026 «Желание сквозь Вселенную»</span><span>UNIVERSE SIGNAL / MVP</span></div>
   </footer>
 
+  <div class="modal" id="signal-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <section class="builder" role="dialog" aria-modal="true" aria-labelledby="builder-title">
+      <button class="modal-close" type="button" aria-label="Закрыть" data-close-modal>×</button>
+      <div class="builder-header">
+        <div><span class="section-kicker">Universe Signal Builder</span><h2 id="builder-title">Создайте свой сигнал</h2></div>
+        <div class="builder-progress" aria-label="Прогресс"><span class="active" data-progress="1">1</span><i></i><span data-progress="2">2</span><i></i><span data-progress="3">3</span><i></i><span data-progress="4">4</span></div>
+      </div>
+
+      <form id="signal-form" novalidate>
+        <div class="builder-step active" data-step="1">
+          <div class="step-heading"><span>Шаг 1</span><h3>Ваше послание</h3><p>Напишите мысль, желание или обращение. Текст можно изменить до подтверждения передачи.</p></div>
+          <div class="form-grid">
+            <label class="field"><span>Имя или псевдоним</span><input id="participant-name" name="name" type="text" maxlength="60" placeholder="Например, Иван" required><small class="field-error"></small></label>
+            <label class="field"><span>Email для уведомлений</span><input id="participant-email" name="email" type="email" maxlength="100" placeholder="name@example.com" required><small class="field-error"></small></label>
+            <label class="field field-full"><span>Послание</span><textarea id="participant-message" name="message" maxlength="500" rows="6" placeholder="Пусть знание объединяет нас. Мы часть одной Вселенной." required></textarea><span class="char-counter"><b id="message-count">0</b> / 500</span><small class="field-error"></small></label>
+            <label class="switch-row field-full"><input id="gift-mode" name="gift" type="checkbox"><span class="switch"></span><span><strong>Это подарок</strong><small>Добавить имя получателя в сертификат</small></span></label>
+            <label class="field field-full gift-field" hidden><span>Имя получателя</span><input id="recipient-name" name="recipient" type="text" maxlength="60" placeholder="Для кого этот сигнал"><small class="field-error"></small></label>
+          </div>
+          <div class="builder-actions"><span></span><button class="button button-gradient" type="button" data-next="2">Продолжить</button></div>
+        </div>
+
+        <div class="builder-step" data-step="2">
+          <div class="step-heading"><span>Шаг 2</span><h3>Выберите цель и формат</h3><p>В MVP доступны три демонстрационные цели. Финальная цель утверждается перед радиосеансом.</p></div>
+          <div class="target-grid">
+            <label class="target-card selected"><input type="radio" name="target" value="HD 20794" checked><span class="target-star target-star-blue"></span><strong>HD 20794</strong><small>примерно 19,7 светового года</small><em>Ближайшая цель</em></label>
+            <label class="target-card"><input type="radio" name="target" value="TRAPPIST-1"><span class="target-star target-star-red"></span><strong>TRAPPIST-1</strong><small>примерно 40 световых лет</small><em>Планетная система</em></label>
+            <label class="target-card"><input type="radio" name="target" value="Polaris"><span class="target-star target-star-white"></span><strong>Полярная звезда</strong><small>примерно 447 световых лет</small><em>Символ направления</em></label>
+          </div>
+          <div class="builder-packages">
+            <label><input type="radio" name="package" value="signal"><span><b>SIGNAL</b><strong>1 490 ₽</strong></span></label>
+            <label class="selected"><input type="radio" name="package" value="personal" checked><span><b>PERSONAL</b><strong>2 990 ₽</strong></span></label>
+            <label><input type="radio" name="package" value="deep"><span><b>DEEP SPACE</b><strong>7 990 ₽</strong></span></label>
+          </div>
+          <div class="builder-actions"><button class="button button-ghost" type="button" data-prev="1">Назад</button><button class="button button-gradient" type="button" data-next="3">Продолжить</button></div>
+        </div>
+
+        <div class="builder-step" data-step="3">
+          <div class="step-heading"><span>Шаг 3</span><h3>Создайте EEG-отпечаток</h3><p>Это демонстрационный режим. Реальная версия будет получать данные с подключенной гарнитуры.</p></div>
+          <div class="eeg-panel">
+            <div class="eeg-topline"><span><i class="eeg-status-dot"></i><b id="eeg-status">Готово к записи</b></span><strong id="eeg-timer">00:08</strong></div>
+            <canvas id="eeg-canvas" width="900" height="240" aria-label="Демонстрационная EEG-волна"></canvas>
+            <div class="eeg-metrics"><div><span>Alpha</span><strong id="metric-alpha">0.00</strong></div><div><span>Beta</span><strong id="metric-beta">0.00</strong></div><div><span>Theta</span><strong id="metric-theta">0.00</strong></div><div><span>Focus</span><strong id="metric-focus">0%</strong></div></div>
+          </div>
+          <button class="button button-outline eeg-button" id="start-eeg" type="button">Начать EEG-демо</button>
+          <label class="consent"><input id="consent" type="checkbox"><span>Я понимаю, что EEG не читает содержание мыслей, а MVP формирует предварительный пакет без фактической радиопередачи.</span></label>
+          <div class="builder-actions"><button class="button button-ghost" type="button" data-prev="2">Назад</button><button class="button button-gradient" id="generate-signal" type="button" disabled>Сформировать сигнал</button></div>
+        </div>
+
+        <div class="builder-step" data-step="4">
+          <div class="success-layout">
+            <div class="success-copy"><span class="success-icon">✓</span><span class="section-kicker">Сигнал сформирован</span><h3>Предварительный пакет готов</h3><p>Он сохранен в этом браузере. После подключения backend заявка сможет отправляться в CRM и на email команды проекта.</p><div class="result-data"><div><span>Universe ID</span><strong id="result-id">-</strong></div><div><span>Цель</span><strong id="result-target">-</strong></div><div><span>Пакет</span><strong id="result-package">-</strong></div><div><span>SHA-256</span><strong id="result-hash">-</strong></div></div><div class="success-actions"><button class="button button-gradient" id="download-signal" type="button">Скачать данные сигнала</button><button class="button button-ghost" id="create-another" type="button">Создать еще один</button></div></div>
+            <div class="mini-certificate" id="generated-certificate"><span class="mini-label">PRELIMINARY CERTIFICATE</span><div class="mini-logo">UNIVERSE SIGNAL</div><div class="mini-name" id="certificate-person">Участник</div><div class="mini-line"></div><div class="mini-fields"><span>Signal ID</span><strong id="certificate-id">-</strong><span>Target</span><strong id="certificate-target">-</strong><span>Status</span><strong>PREPARED</strong></div><div class="mini-hash" id="certificate-hash">-</div><div class="mini-seal">DATA<br>VERIFIED</div></div>
+          </div>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="script.js"></script>
 </body>
 </html>
