@@ -5,6 +5,7 @@
   const CRM_STORAGE_KEY = 'intentraSpace.crm.route1_1.v3';
   const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
   const SIGNATURE = 'С уважением,\nРуководитель проекта - Корытник Иван Анатольевич\nINTENTRA SPACE';
+  const MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024;
   const TERMINAL_TASKS = new Set(['done', 'cancelled']);
   const STAGES = ['queued', 'contacted', 'waiting', 'connected', 'technical', 'meeting_proposed', 'meeting_scheduled', 'decision', 'paused'];
   const LETTER_STAGE_MAP = {
@@ -32,6 +33,7 @@
   let gisPromise = null;
   let observer = null;
   let composeContext = null;
+  let selectedAttachments = [];
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -79,27 +81,89 @@
   function utf8ToBase64Url(text) {
     const bytes = new TextEncoder().encode(text);
     let binary = '';
-    bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+    }
     return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
 
   function encodeHeader(value) {
     const bytes = new TextEncoder().encode(String(value || ''));
     let binary = '';
-    bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+    }
     return `=?UTF-8?B?${btoa(binary)}?=`;
   }
 
-  function buildRawMessage(to, subject, body) {
-    return utf8ToBase64Url([
+  function wrapBase64(value) {
+    return String(value || '').replace(/(.{76})/g, '$1\r\n');
+  }
+
+  function safeMimeName(value) {
+    return String(value || 'attachment')
+      .replace(/[\r\n]/g, ' ')
+      .replace(/["\\]/g, '_');
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const value = String(reader.result || '');
+        resolve(value.includes(',') ? value.split(',').pop() : value);
+      };
+      reader.onerror = () => reject(reader.error || new Error('FILE_READ_FAILED'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function buildRawMessage(to, subject, body, attachments = []) {
+    if (!attachments.length) {
+      return utf8ToBase64Url([
+        `To: ${to}`,
+        `Subject: ${encodeHeader(subject)}`,
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'Content-Transfer-Encoding: 8bit',
+        '',
+        body,
+      ].join('\r\n'));
+    }
+
+    const boundary = `intentra_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    const parts = [
       `To: ${to}`,
       `Subject: ${encodeHeader(subject)}`,
       'MIME-Version: 1.0',
+      `Content-Type: multipart/mixed; boundary="${boundary}"`,
+      '',
+      `--${boundary}`,
       'Content-Type: text/plain; charset=UTF-8',
       'Content-Transfer-Encoding: 8bit',
       '',
       body,
-    ].join('\r\n'));
+    ];
+
+    for (const file of attachments) {
+      const encoded = await fileToBase64(file);
+      const mimeType = file.type || 'application/octet-stream';
+      const safeName = safeMimeName(file.name);
+      const encodedName = encodeURIComponent(file.name || 'attachment');
+      parts.push(
+        `--${boundary}`,
+        `Content-Type: ${mimeType}; name="${safeName}"; name*=UTF-8''${encodedName}`,
+        'Content-Transfer-Encoding: base64',
+        `Content-Disposition: attachment; filename="${safeName}"; filename*=UTF-8''${encodedName}`,
+        '',
+        wrapBase64(encoded),
+      );
+    }
+
+    parts.push(`--${boundary}--`, '');
+    return utf8ToBase64Url(parts.join('\r\n'));
   }
 
   function getClientId() {
@@ -176,11 +240,20 @@
   }
 
   async function postMessage(token, data) {
+    const raw = await buildRawMessage(data.to, data.subject, data.body, data.attachments || []);
     return fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ raw: buildRawMessage(data.to, data.subject, data.body) }),
+      body: JSON.stringify({ raw }),
     });
+  }
+
+  function attachmentMeta(data) {
+    return (data.attachments || []).map((file) => ({
+      name: file.name,
+      size: Number(file.size || 0),
+      type: file.type || 'application/octet-stream',
+    }));
   }
 
   function pushActivity(state, type, text, relatedId = '', at = new Date().toISOString()) {
@@ -244,6 +317,9 @@
     const targetStage = LETTER_STAGE_MAP[data.id] || 'waiting';
     const method = options.method || 'gmail';
     const methodLabel = method === 'gmail' ? 'Gmail' : 'вручную';
+    const attachments = attachmentMeta(data);
+    const attachmentNames = attachments.map((item) => item.name);
+    const attachmentText = attachmentNames.length ? ` Вложения: ${attachmentNames.join(', ')}.` : '';
 
     state.letterStatus = state.letterStatus && typeof state.letterStatus === 'object' ? state.letterStatus : {};
     state.letterStatus[data.id] = {
@@ -253,6 +329,7 @@
       to: data.to,
       subject: data.subject,
       sentBody: data.body,
+      attachments,
       gmailMessageId: options.gmailMessageId || state.letterStatus[data.id]?.gmailMessageId || '',
     };
 
@@ -265,6 +342,7 @@
       method,
       to: data.to,
       subject: data.subject,
+      attachments,
       gmailMessageId: options.gmailMessageId || '',
     });
     state.emailHistory = state.emailHistory.slice(0, 300);
@@ -274,7 +352,8 @@
       contact.lastContactChannel = method === 'gmail' ? 'Gmail' : 'E-mail';
       contact.lastContactEmail = data.to;
       contact.lastContactSubject = data.subject;
-      moveContactForward(state, contact, targetStage, `Письмо отправлено ${methodLabel}: «${data.subject}»`, at);
+      contact.lastContactAttachments = attachmentNames;
+      moveContactForward(state, contact, targetStage, `Письмо отправлено ${methodLabel}: «${data.subject}».${attachmentText}`, at);
     }
 
     if (task && !TERMINAL_TASKS.has(task.status)) {
@@ -283,7 +362,8 @@
       task.lastEmailAt = at;
       task.lastEmailSubject = data.subject;
       task.lastEmailTo = data.to;
-      const note = `${todayISO()}: письмо отправлено ${methodLabel} на ${data.to}. Ожидаем ответ. Тема: ${data.subject}`;
+      task.lastEmailAttachments = attachmentNames;
+      const note = `${todayISO()}: письмо отправлено ${methodLabel} на ${data.to}. Ожидаем ответ. Тема: ${data.subject}.${attachmentText}`;
       task.comment = task.comment ? `${task.comment}\n${note}` : note;
       pushActivity(state, 'task_waiting', `Задача переведена в «Ожидаем»: ${task.title}`, task.id, at);
     }
@@ -291,7 +371,7 @@
     pushActivity(
       state,
       'email_sent',
-      `Отправлено письмо ${methodLabel}: ${data.to}. Тема: ${data.subject}`,
+      `Отправлено письмо ${methodLabel}: ${data.to}. Тема: ${data.subject}.${attachmentText}`,
       contact?.id || data.id,
       at
     );
@@ -302,7 +382,57 @@
       contactName: contact?.shortName || contact?.name || '',
       taskTitle: task?.title || '',
       targetStage,
+      attachmentNames,
     };
+  }
+
+  function formatBytes(bytes) {
+    const size = Number(bytes || 0);
+    if (size < 1024) return `${size} Б`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} КБ`;
+    return `${(size / (1024 * 1024)).toFixed(1)} МБ`;
+  }
+
+  function attachmentKey(file) {
+    return `${file.name}|${file.size}|${file.lastModified}`;
+  }
+
+  function renderAttachments() {
+    const list = $('#gmail-attachment-list');
+    const total = $('#gmail-attachment-total');
+    if (!list || !total) return;
+    const totalBytes = selectedAttachments.reduce((sum, file) => sum + Number(file.size || 0), 0);
+    total.textContent = selectedAttachments.length
+      ? `${selectedAttachments.length} файл(а), ${formatBytes(totalBytes)}`
+      : 'Файлы не выбраны';
+    list.innerHTML = selectedAttachments.map((file, index) => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid rgba(120,130,150,.22);border-radius:10px;margin-top:7px">
+        <div style="min-width:0;flex:1">
+          <strong style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${String(file.name).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+          <span style="font-size:11px;color:#697386">${formatBytes(file.size)}</span>
+        </div>
+        <button type="button" class="button button-soft" data-remove-attachment="${index}" style="padding:6px 9px">Удалить</button>
+      </div>`).join('');
+  }
+
+  function resetAttachments() {
+    selectedAttachments = [];
+    const input = $('#gmail-attachments');
+    if (input) input.value = '';
+    renderAttachments();
+  }
+
+  function addAttachments(files) {
+    const current = new Map(selectedAttachments.map((file) => [attachmentKey(file), file]));
+    Array.from(files || []).forEach((file) => current.set(attachmentKey(file), file));
+    const next = Array.from(current.values());
+    const totalBytes = next.reduce((sum, file) => sum + Number(file.size || 0), 0);
+    if (totalBytes > MAX_ATTACHMENT_BYTES) {
+      toast('Суммарный размер вложений не должен превышать 20 МБ');
+      return;
+    }
+    selectedAttachments = next;
+    renderAttachments();
   }
 
   function ensureComposeDialog() {
@@ -320,9 +450,21 @@
         <div class="form-grid">
           <label class="field field-wide"><span>Кому</span><input name="to" type="email" readonly></label>
           <label class="field field-wide"><span>Тема *</span><input name="subject" required maxlength="300"></label>
-          <label class="field field-wide"><span>Текст письма *</span><textarea name="body" rows="18" required style="min-height:360px;line-height:1.5;resize:vertical"></textarea></label>
+          <label class="field field-wide"><span>Текст письма *</span><textarea name="body" rows="15" required style="min-height:300px;line-height:1.5;resize:vertical"></textarea></label>
+          <div class="field field-wide">
+            <span>Вложения</span>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:7px">
+              <label class="button button-soft" style="cursor:pointer;margin:0">
+                + Прикрепить файл
+                <input id="gmail-attachments" type="file" multiple hidden>
+              </label>
+              <span id="gmail-attachment-total" style="font-size:11px;color:#697386">Файлы не выбраны</span>
+            </div>
+            <div id="gmail-attachment-list"></div>
+            <small style="display:block;margin-top:7px;color:#697386">Можно выбрать несколько файлов. До 20 МБ суммарно.</small>
+          </div>
         </div>
-        <div style="padding:0 22px 4px;color:#697386;font-size:11px">После отправки CRM автоматически зафиксирует письмо, переведет связанную задачу в «Ожидаем» и обновит этап ЛПР. Письмо уйдет только после нажатия менеджером кнопки ниже.</div>
+        <div style="padding:0 22px 4px;color:#697386;font-size:11px">После отправки CRM зафиксирует письмо и названия вложений, переведет связанную задачу в «Ожидаем» и обновит этап ЛПР. Письмо уйдет только после нажатия менеджером кнопки ниже.</div>
         <div class="modal-actions">
           <button class="button button-soft" type="button" data-gmail-close>Отмена</button>
           <button class="button button-primary" type="submit" id="gmail-send-confirm">Отправить письмо</button>
@@ -330,13 +472,31 @@
       </form>`;
     document.body.appendChild(dialog);
 
+    $('#gmail-attachments', dialog).addEventListener('change', (event) => {
+      addAttachments(event.target.files);
+      event.target.value = '';
+    });
+
+    $('#gmail-attachment-list', dialog).addEventListener('click', (event) => {
+      const removeButton = event.target.closest('[data-remove-attachment]');
+      if (!removeButton) return;
+      const index = Number(removeButton.dataset.removeAttachment);
+      if (!Number.isInteger(index) || index < 0 || index >= selectedAttachments.length) return;
+      selectedAttachments.splice(index, 1);
+      renderAttachments();
+    });
+
     $$('[data-gmail-close]', dialog).forEach((button) => {
       button.addEventListener('click', () => {
         composeContext = null;
+        resetAttachments();
         if (dialog.open) dialog.close();
       });
     });
-    dialog.addEventListener('cancel', () => { composeContext = null; });
+    dialog.addEventListener('cancel', () => {
+      composeContext = null;
+      resetAttachments();
+    });
 
     $('#gmail-compose-form', dialog).addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -346,13 +506,22 @@
       const body = form.elements.body.value.trim();
       if (!subject || !body) return toast('Заполните тему и текст письма');
 
+      const totalBytes = selectedAttachments.reduce((sum, file) => sum + Number(file.size || 0), 0);
+      if (totalBytes > MAX_ATTACHMENT_BYTES) return toast('Суммарный размер вложений не должен превышать 20 МБ');
+
       const sendButton = $('#gmail-send-confirm', dialog);
       sendButton.disabled = true;
-      sendButton.textContent = 'Отправляем...';
+      sendButton.textContent = selectedAttachments.length ? 'Готовим вложения...' : 'Отправляем...';
 
       try {
-        const message = { ...composeContext.data, subject, body };
+        const message = {
+          ...composeContext.data,
+          subject,
+          body,
+          attachments: selectedAttachments.slice(),
+        };
         let token = accessToken || await ensureToken();
+        sendButton.textContent = 'Отправляем...';
         let response = await postMessage(token, message);
         if (response.status === 401) {
           accessToken = '';
@@ -370,16 +539,22 @@
 
         if (dialog.open) dialog.close();
         composeContext = null;
+        resetAttachments();
+        const attachmentInfo = syncResult?.attachmentNames?.length
+          ? ` Вложений: ${syncResult.attachmentNames.length}.`
+          : '';
         const processText = syncResult?.taskTitle
-          ? 'Задача переведена в «Ожидаем», воронка и история обновлены.'
-          : 'Воронка и история CRM обновлены.';
-        toast(`Письмо отправлено: ${message.to}. ${processText}`);
-        window.setTimeout(() => window.location.reload(), 1200);
+          ? ' Задача переведена в «Ожидаем», воронка и история обновлены.'
+          : ' Воронка и история CRM обновлены.';
+        toast(`Письмо отправлено: ${message.to}.${attachmentInfo}${processText}`);
+        window.setTimeout(() => window.location.reload(), 1400);
       } catch (error) {
         console.error('Gmail send failed', error);
         if (error.message === 'GMAIL_NOT_CONFIGURED') {
           openSettings();
           toast('Сначала укажите Google OAuth Client ID');
+        } else if (error.message === 'FILE_READ_FAILED') {
+          toast('Не удалось прочитать один из прикрепленных файлов');
         } else toast('Не удалось отправить письмо через Gmail');
       } finally {
         sendButton.disabled = false;
@@ -398,6 +573,7 @@
     form.elements.to.value = data.to;
     form.elements.subject.value = data.subject;
     form.elements.body.value = data.body;
+    resetAttachments();
     composeContext = { card, data };
     if (typeof dialog.showModal === 'function') dialog.showModal();
     else dialog.setAttribute('open', '');
