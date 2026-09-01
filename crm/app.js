@@ -3,7 +3,7 @@
 
   const load = (src) => new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = `${src}?v=20260901-3`;
+    script.src = `${src}?v=20260901-4`;
     script.onload = resolve;
     script.onerror = () => reject(new Error(`${src} failed to load`));
     document.body.appendChild(script);
