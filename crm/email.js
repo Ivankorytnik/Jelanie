@@ -9,6 +9,7 @@
   let accessToken = '';
   let gisPromise = null;
   let observer = null;
+  let composeContext = null;
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -37,11 +38,7 @@
 
   function normalizeSignature(body) {
     let clean = String(body || '').trim();
-    const markers = [
-      '\nС уважением,',
-      '\r\nС уважением,',
-      'С уважением,'
-    ];
+    const markers = ['\nС уважением,', '\r\nС уважением,', 'С уважением,'];
     let cut = -1;
     markers.forEach((marker) => {
       const pos = clean.lastIndexOf(marker);
@@ -170,7 +167,96 @@
     });
   }
 
-  async function sendViaGmail(card) {
+  function ensureComposeDialog() {
+    let dialog = $('#gmail-compose-modal');
+    if (dialog) return dialog;
+
+    dialog = document.createElement('dialog');
+    dialog.id = 'gmail-compose-modal';
+    dialog.className = 'modal';
+    dialog.innerHTML = `
+      <form id="gmail-compose-form" class="modal-card modal-large" method="dialog">
+        <div class="modal-heading">
+          <div><span class="section-label">Проверка перед отправкой</span><h2>Письмо из Gmail</h2></div>
+          <button class="modal-close" type="button" data-gmail-close aria-label="Закрыть">×</button>
+        </div>
+        <div class="form-grid">
+          <label class="field field-wide"><span>Кому</span><input name="to" type="email" readonly></label>
+          <label class="field field-wide"><span>Тема *</span><input name="subject" required maxlength="300"></label>
+          <label class="field field-wide"><span>Текст письма *</span><textarea name="body" rows="18" required style="min-height:360px;line-height:1.5;resize:vertical"></textarea></label>
+        </div>
+        <div style="padding:0 22px 4px;color:#697386;font-size:11px">Письмо не отправляется автоматически. Оно уйдет только после нажатия кнопки «Отправить письмо» менеджером.</div>
+        <div class="modal-actions">
+          <button class="button button-soft" type="button" data-gmail-close>Отмена</button>
+          <button class="button button-primary" type="submit" id="gmail-send-confirm">Отправить письмо</button>
+        </div>
+      </form>`;
+    document.body.appendChild(dialog);
+
+    $$('[data-gmail-close]', dialog).forEach((button) => {
+      button.addEventListener('click', () => {
+        composeContext = null;
+        if (dialog.open) dialog.close();
+      });
+    });
+
+    dialog.addEventListener('cancel', () => { composeContext = null; });
+
+    $('#gmail-compose-form', dialog).addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!composeContext) return;
+
+      const form = event.currentTarget;
+      const subject = form.elements.subject.value.trim();
+      const body = form.elements.body.value.trim();
+      if (!subject || !body) {
+        toast('Заполните тему и текст письма');
+        return;
+      }
+
+      const sendButton = $('#gmail-send-confirm', dialog);
+      sendButton.disabled = true;
+      sendButton.textContent = 'Отправляем...';
+
+      try {
+        const message = {
+          ...composeContext.data,
+          subject,
+          body,
+        };
+        let token = accessToken || await ensureToken();
+        let response = await postMessage(token, message);
+        if (response.status === 401) {
+          accessToken = '';
+          token = await ensureToken();
+          response = await postMessage(token, message);
+        }
+        if (!response.ok) throw new Error(`GMAIL_API_${response.status}`);
+
+        const sentToggle = $('[data-toggle-letter-sent]', composeContext.card);
+        if (sentToggle && /Отметить отправленным/i.test(sentToggle.textContent || '')) sentToggle.click();
+
+        if (dialog.open) dialog.close();
+        toast(`Письмо отправлено: ${message.to}`);
+        composeContext = null;
+      } catch (error) {
+        console.error('Gmail send failed', error);
+        if (error.message === 'GMAIL_NOT_CONFIGURED') {
+          openSettings();
+          toast('Сначала укажите Google OAuth Client ID');
+        } else {
+          toast('Не удалось отправить письмо через Gmail');
+        }
+      } finally {
+        sendButton.disabled = false;
+        sendButton.textContent = 'Отправить письмо';
+      }
+    });
+
+    return dialog;
+  }
+
+  function openCompose(card) {
     const data = getLetterDataFromCard(card);
     if (!data) {
       toast('Не удалось прочитать письмо');
@@ -181,33 +267,16 @@
       return;
     }
 
-    const approved = window.confirm(
-      `Отправить письмо из Gmail?\n\nКому: ${data.to}\nТема: ${data.subject}\n\nПисьмо отправится только после нажатия ОК менеджером.`
-    );
-    if (!approved) return;
+    const dialog = ensureComposeDialog();
+    const form = $('#gmail-compose-form', dialog);
+    form.elements.to.value = data.to;
+    form.elements.subject.value = data.subject;
+    form.elements.body.value = data.body;
+    composeContext = { card, data };
 
-    try {
-      let token = accessToken || await ensureToken();
-      let response = await postMessage(token, data);
-      if (response.status === 401) {
-        accessToken = '';
-        token = await ensureToken();
-        response = await postMessage(token, data);
-      }
-      if (!response.ok) throw new Error(`GMAIL_API_${response.status}`);
-
-      const sentToggle = $('[data-toggle-letter-sent]', card);
-      if (sentToggle && /Отметить отправленным/i.test(sentToggle.textContent || '')) sentToggle.click();
-      toast(`Письмо отправлено: ${data.to}`);
-    } catch (error) {
-      console.error('Gmail send failed', error);
-      if (error.message === 'GMAIL_NOT_CONFIGURED') {
-        openSettings();
-        toast('Сначала укажите Google OAuth Client ID');
-      } else {
-        toast('Не удалось отправить письмо через Gmail');
-      }
-    }
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    else dialog.setAttribute('open', '');
+    window.setTimeout(() => form.elements.subject.focus(), 50);
   }
 
   function openSettings() {
@@ -256,12 +325,12 @@
     button.textContent = data?.to ? 'Отправить из Gmail' : 'Нет e-mail';
     button.disabled = !data?.to;
     button.title = data?.to
-      ? `Отправить менеджером на ${data.to}`
+      ? `Открыть редактор письма для ${data.to}`
       : 'В карточке письма не найден e-mail';
     button.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
-      sendViaGmail(card);
+      openCompose(card);
     });
     container.prepend(button);
   }
@@ -303,6 +372,7 @@
 
   function init() {
     refreshGmailStatus();
+    ensureComposeDialog();
     enhanceLetters();
     const materials = $('#materials-content');
     if (materials) {
