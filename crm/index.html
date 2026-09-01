@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0e18">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="INTENTRA SPACE CRM: управляемый маршрут менеджера к закрытому пилоту.">
+  <title>INTENTRA SPACE CRM</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Навигация CRM">
+      <a class="brand" href="./" aria-label="INTENTRA SPACE CRM">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"></circle><path d="M8 27c8 10 25 12 34 1M18 31l17-17"></path><circle cx="37" cy="11" r="2.5"></circle></svg>
+        </span>
+        <span><strong>INTENTRA</strong><small>SPACE CRM</small></span>
+      </a>
+
+      <nav class="side-nav">
+        <button class="nav-button active" type="button" data-view="dashboard"><span>01</span>Панель</button>
+        <button class="nav-button" type="button" data-view="tasks"><span>02</span>Задачи</button>
+        <button class="nav-button" type="button" data-view="funnel"><span>03</span>Воронка</button>
+        <button class="nav-button" type="button" data-view="contacts"><span>04</span>ЛПР</button>
+        <button class="nav-button" type="button" data-view="materials"><span>05</span>Материалы</button>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="status-dot"></span>
+        <div><strong>Маршрут 1.1</strong><small>Обновлено 01.09.2026</small></div>
+      </div>
+      <a class="project-link" href="../" target="_blank" rel="noopener">Открыть MVP <span>↗</span></a>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="page-eyebrow">Управление проектом</p>
+          <h1 id="page-title">Панель менеджера</h1>
+        </div>
+        <div class="topbar-actions">
+          <button class="button button-soft" type="button" id="open-settings">Настройки</button>
+          <button class="button button-primary" type="button" data-new-task>+ Задача</button>
+          <button class="icon-button menu-button" type="button" id="menu-button" aria-label="Открыть меню" aria-expanded="false">•••</button>
+          <div class="action-menu" id="action-menu" hidden>
+            <button type="button" id="menu-settings">Настройки маршрута</button>
+            <button type="button" id="export-data">Экспорт JSON</button>
+            <button type="button" id="import-data">Импорт JSON</button>
+            <button type="button" id="reset-data" class="danger-text">Сбросить к маршруту 1.1</button>
+          </div>
+          <input type="file" id="import-file" accept="application/json,.json" hidden>
+        </div>
+      </header>
+
+      <div class="view active" id="view-dashboard" data-view-panel="dashboard">
+        <section class="kpi-hero" id="kpi-hero"></section>
+        <section class="metric-grid" id="metric-grid" aria-label="Показатели проекта"></section>
+
+        <div class="dashboard-grid">
+          <section class="panel panel-wide">
+            <div class="panel-heading">
+              <div><span class="section-label">Приоритет на сейчас</span><h2 id="today-heading">Действия менеджера</h2></div>
+              <button class="text-button" type="button" data-view-jump="tasks">Все задачи →</button>
+            </div>
+            <div id="today-tasks" class="task-stack"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading"><div><span class="section-label">Контроль решения</span><h2>Gate 0 / 1 / 2</h2></div></div>
+            <div id="gate-list" class="gate-list"></div>
+          </section>
+        </div>
+
+        <section class="panel route-panel">
+          <div class="panel-heading">
+            <div><span class="section-label">Два маршрута запускаются параллельно</span><h2>Маршруты к пилоту</h2></div>
+            <span class="quiet-badge" id="selected-route-label">Маршрут не выбран</span>
+          </div>
+          <div class="route-grid" id="route-grid"></div>
+        </section>
+
+        <section class="panel rules-panel">
+          <div class="panel-heading"><div><span class="section-label">Не менять логику в процессе</span><h2>Правила менеджера</h2></div></div>
+          <ol id="manager-rules" class="rules-list"></ol>
+        </section>
+      </div>
+
+      <div class="view" id="view-tasks" data-view-panel="tasks">
+        <section class="toolbar panel">
+          <label class="search-field"><span>⌕</span><input id="task-search" type="search" placeholder="Поиск по задаче или ЛПР"></label>
+          <label><span>Статус</span><select id="task-status-filter"><option value="active">Активные</option><option value="all">Все</option><option value="todo">Не начато</option><option value="in_progress">В работе</option><option value="waiting">Ожидаем</option><option value="done">Выполнено</option><option value="cancelled">Отменено</option></select></label>
+          <label><span>Маршрут</span><select id="task-route-filter"><option value="all">Все</option><option value="A">A: РТ-64</option><option value="B">B: аренда</option><option value="PROJECT">Проект / Gate</option></select></label>
+          <label><span>Приоритет</span><select id="task-priority-filter"><option value="all">Все</option><option value="critical">Критическая</option><option value="high">Высокая</option><option value="medium">Средняя</option></select></label>
+          <button class="button button-primary toolbar-add" type="button" data-new-task>+ Новая задача</button>
+        </section>
+        <section class="panel task-table-panel">
+          <div class="panel-heading">
+            <div><span class="section-label">Один список без дублей</span><h2>План действий</h2></div>
+            <span class="quiet-badge" id="task-count-label"></span>
+          </div>
+          <div id="task-list" class="task-list"></div>
+        </section>
+      </div>
+
+      <div class="view" id="view-funnel" data-view-panel="funnel">
+        <section class="toolbar panel funnel-toolbar">
+          <label class="search-field"><span>⌕</span><input id="funnel-search" type="search" placeholder="Найти ЛПР"></label>
+          <label><span>Маршрут</span><select id="funnel-route-filter"><option value="all">Все маршруты</option><option value="A">A: РТ-64</option><option value="B">B: аренда</option></select></label>
+          <div class="toolbar-hint"><span class="drag-icon">↔</span> Перетащите карточку или смените этап в списке</div>
+        </section>
+        <section class="kanban-wrap" aria-label="Воронка ЛПР">
+          <div class="kanban" id="kanban"></div>
+        </section>
+      </div>
+
+      <div class="view" id="view-contacts" data-view-panel="contacts">
+        <section class="toolbar panel">
+          <label class="search-field"><span>⌕</span><input id="contact-search" type="search" placeholder="ФИО, организация, роль"></label>
+          <label><span>Маршрут</span><select id="contact-route-filter"><option value="all">Все маршруты</option><option value="A">A: РТ-64</option><option value="B">B: аренда</option></select></label>
+          <label><span>Значимость</span><select id="contact-importance-filter"><option value="all">Все</option><option value="critical">Критическая</option><option value="high">Высокая</option><option value="medium">Средняя</option><option value="reserve">Резервная</option></select></label>
+          <button class="button button-primary toolbar-add" type="button" id="new-contact">+ Новый ЛПР</button>
+        </section>
+        <section class="panel contacts-panel">
+          <div class="panel-heading"><div><span class="section-label">Порядок запуска, а не иерархия</span><h2>ЛПР по очереди</h2></div><span class="quiet-badge" id="contact-count-label"></span></div>
+          <div id="contact-list" class="contact-list"></div>
+        </section>
+      </div>
+
+      <div class="view" id="view-materials" data-view-panel="materials">
+        <div class="material-tabs" role="tablist" aria-label="Материалы проекта">
+          <button class="active" type="button" data-material-tab="letters">Письма <span id="letters-count"></span></button>
+          <button type="button" data-material-tab="scripts">Скрипты</button>
+          <button type="button" data-material-tab="brief">Технический бриф</button>
+        </div>
+        <section id="materials-content"></section>
+      </div>
+    </main>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Мобильная навигация">
+    <button class="active" type="button" data-view="dashboard"><span>⌂</span>Панель</button>
+    <button type="button" data-view="tasks"><span>✓</span>Задачи</button>
+    <button type="button" data-view="funnel"><span>▦</span>Воронка</button>
+    <button type="button" data-view="contacts"><span>◎</span>ЛПР</button>
+    <button type="button" data-view="materials"><span>≡</span>Материалы</button>
+  </nav>
+
+  <dialog class="modal" id="task-modal">
+    <form method="dialog" id="task-form" class="modal-card modal-large">
+      <div class="modal-heading"><div><span class="section-label">Следующее действие</span><h2 id="task-modal-title">Новая задача</h2></div><button class="modal-close" type="button" data-close-modal aria-label="Закрыть">×</button></div>
+      <input type="hidden" name="id">
+      <input type="hidden" name="parentTaskId">
+      <div class="form-grid">
+        <label class="field field-wide"><span>Задача *</span><input name="title" required maxlength="180" placeholder="Например: позвонить и уточнить статус"></label>
+        <label class="field"><span>ЛПР</span><select name="contactId" id="task-contact-select"></select></label>
+        <label class="field"><span>Контакт / организация</span><input name="counterparty" maxlength="180" placeholder="Если задача относится к группе"></label>
+        <label class="field"><span>Срок *</span><input name="dueDate" type="date" required></label>
+        <label class="field"><span>Маршрут</span><select name="route"><option value="A">A: РТ-64</option><option value="B">B: аренда</option><option value="AB">A / B</option><option value="PROJECT">Проект / Gate</option><option value="SELECTED">Выбранный маршрут</option></select></label>
+        <label class="field"><span>Приоритет</span><select name="importance"><option value="critical">Критическая</option><option value="high">Высокая</option><option value="medium">Средняя</option></select></label>
+        <label class="field"><span>Статус</span><select name="status"><option value="todo">Не начато</option><option value="in_progress">В работе</option><option value="waiting">Ожидаем</option><option value="done">Выполнено</option><option value="cancelled">Отменено</option></select></label>
+        <label class="field"><span>Канал</span><input name="channel" maxlength="120" placeholder="E-mail / телефон / встреча"></label>
+        <label class="field field-wide"><span>Действие</span><textarea name="action" rows="2" maxlength="500"></textarea></label>
+        <label class="field field-wide"><span>Цель</span><textarea name="goal" rows="2" maxlength="500"></textarea></label>
+        <label class="field field-wide"><span>Критерий результата</span><textarea name="criterion" rows="2" maxlength="600"></textarea></label>
+        <label class="field field-wide"><span>Следующий шаг / условие</span><textarea name="nextStep" rows="2" maxlength="600"></textarea></label>
+        <label class="field field-wide"><span>Комментарий</span><textarea name="comment" rows="3" maxlength="1000"></textarea></label>
+      </div>
+      <div class="modal-actions"><button class="button button-soft" type="button" data-close-modal>Отмена</button><button class="button button-primary" type="submit">Сохранить задачу</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="complete-modal">
+    <form method="dialog" id="complete-form" class="modal-card">
+      <div class="modal-heading"><div><span class="section-label">Фиксация результата</span><h2>Завершить задачу</h2></div><button class="modal-close" type="button" data-close-modal aria-label="Закрыть">×</button></div>
+      <input type="hidden" name="taskId">
+      <label class="field"><span>Фактическая дата</span><input name="actualDate" type="date" required></label>
+      <label class="field"><span>Что получено *</span><textarea name="actualResult" rows="4" required maxlength="1000" placeholder="Ответ, контакт, срок, отказ или договоренность"></textarea></label>
+      <label class="field"><span>Перевести ЛПР на этап</span><select name="nextStage" id="complete-stage-select"></select></label>
+      <label class="check-field"><input name="createNext" type="checkbox" checked><span>Сразу создать следующий шаг</span></label>
+      <div class="modal-actions"><button class="button button-soft" type="button" data-close-modal>Отмена</button><button class="button button-primary" type="submit">Выполнено</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="contact-modal">
+    <form method="dialog" id="contact-form" class="modal-card modal-large">
+      <div class="modal-heading"><div><span class="section-label">Карточка контакта</span><h2 id="contact-modal-title">Новый ЛПР</h2></div><button class="modal-close" type="button" data-close-modal aria-label="Закрыть">×</button></div>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label class="field field-wide"><span>ФИО *</span><input name="name" required maxlength="180"></label>
+        <label class="field"><span>Организация</span><input name="organization" maxlength="180"></label>
+        <label class="field"><span>Должность</span><input name="position" maxlength="220"></label>
+        <label class="field"><span>Роль в решении</span><input name="role" maxlength="220"></label>
+        <label class="field"><span>Маршрут</span><select name="route"><option value="A">A: РТ-64</option><option value="B">B: аренда</option></select></label>
+        <label class="field"><span>Значимость</span><select name="importance"><option value="critical">Критическая</option><option value="high">Высокая</option><option value="medium">Средняя</option><option value="reserve">Резервная</option></select></label>
+        <label class="field"><span>Этап</span><select name="stage" id="contact-stage-select"></select></label>
+        <label class="field"><span>Очередь</span><input name="order" type="number" min="1" step="1"></label>
+        <label class="field"><span>Телефон</span><input name="phone" inputmode="tel" maxlength="30"></label>
+        <label class="field"><span>E-mail</span><input name="email" type="email" maxlength="180"></label>
+        <label class="field"><span>Канал</span><input name="channel" maxlength="180"></label>
+        <label class="field field-wide"><span>Почему сейчас</span><textarea name="whyNow" rows="2" maxlength="600"></textarea></label>
+        <label class="field field-wide"><span>Цель контакта</span><textarea name="goal" rows="2" maxlength="600"></textarea></label>
+        <label class="field field-wide"><span>Ожидаемый результат</span><textarea name="expected" rows="2" maxlength="600"></textarea></label>
+        <label class="field field-wide"><span>Условие / резерв</span><textarea name="condition" rows="3" maxlength="1000"></textarea></label>
+        <label class="field field-wide"><span>Комментарий менеджера</span><textarea name="note" rows="3" maxlength="1000"></textarea></label>
+      </div>
+      <div class="history-block" id="contact-history-block" hidden></div>
+      <div class="modal-actions"><button class="button button-soft" type="button" data-close-modal>Отмена</button><button class="button button-primary" type="submit">Сохранить ЛПР</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="meeting-modal">
+    <form method="dialog" id="meeting-form" class="modal-card">
+      <div class="modal-heading"><div><span class="section-label">Финальный KPI</span><h2>Зафиксировать встречу</h2></div><button class="modal-close" type="button" data-close-modal aria-label="Закрыть">×</button></div>
+      <label class="field"><span>Главный ЛПР / партнер *</span><input name="decisionMaker" required maxlength="180"></label>
+      <label class="field"><span>Технический ответственный *</span><input name="technicalOwner" required maxlength="180"></label>
+      <div class="form-grid compact-grid">
+        <label class="field"><span>Дата *</span><input name="date" type="date" required></label>
+        <label class="field"><span>Время *</span><input name="time" type="time" required></label>
+      </div>
+      <label class="field"><span>Место / ссылка *</span><input name="place" required maxlength="250"></label>
+      <label class="field"><span>Участники</span><textarea name="participants" rows="2" maxlength="600"></textarea></label>
+      <label class="field"><span>Повестка</span><textarea name="agenda" rows="3" maxlength="800"></textarea></label>
+      <label class="check-field"><input name="confirmed" type="checkbox"><span>Встреча подтверждена второй стороной</span></label>
+      <div class="modal-actions"><button class="button button-soft" type="button" data-close-modal>Отмена</button><button class="button button-primary" type="submit">Сохранить встречу</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="settings-modal">
+    <form method="dialog" id="settings-form" class="modal-card">
+      <div class="modal-heading"><div><span class="section-label">Параметры спринта</span><h2>Настройки маршрута</h2></div><button class="modal-close" type="button" data-close-modal aria-label="Закрыть">×</button></div>
+      <label class="field"><span>Дата старта</span><input name="startDate" type="date" required></label>
+      <p class="form-note">При изменении даты сроки всех незавершенных плановых задач пересчитаются по дням 0-14. Выполненные задачи и созданные вручную сроки сохранятся.</p>
+      <div class="modal-actions"><button class="button button-soft" type="button" data-close-modal>Отмена</button><button class="button button-primary" type="submit">Пересчитать план</button></div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="public-seed.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
