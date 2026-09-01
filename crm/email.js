@@ -2,8 +2,30 @@
   'use strict';
 
   const CLIENT_ID_KEY = 'intentraSpace.gmail.clientId';
+  const CRM_STORAGE_KEY = 'intentraSpace.crm.route1_1.v3';
   const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
   const SIGNATURE = 'С уважением,\nРуководитель проекта - Корытник Иван Анатольевич\nINTENTRA SPACE';
+  const TERMINAL_TASKS = new Set(['done', 'cancelled']);
+  const STAGES = ['queued', 'contacted', 'waiting', 'connected', 'technical', 'meeting_proposed', 'meeting_scheduled', 'decision', 'paused'];
+  const LETTER_STAGE_MAP = {
+    l1: 'waiting',
+    l2: 'waiting',
+    l3: 'waiting',
+    l4: 'meeting_proposed',
+    l5: 'meeting_proposed',
+    l6: 'waiting',
+    l7: 'waiting',
+    l8: 'waiting',
+    l9: 'waiting',
+    l10: 'waiting',
+  };
+  const LETTER_TASK_MAP = {
+    l1: 't2',
+    l2: 't3',
+    l3: 't4',
+    l4: 't7',
+    l5: 't9',
+  };
 
   let tokenClient = null;
   let accessToken = '';
@@ -14,6 +36,14 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
+  function todayISO() {
+    const date = new Date();
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
   function toast(text) {
     const old = $('#gmail-toast');
     if (old) old.remove();
@@ -21,19 +51,12 @@
     el.id = 'gmail-toast';
     el.textContent = text;
     Object.assign(el.style, {
-      position: 'fixed',
-      right: '20px',
-      bottom: '20px',
-      zIndex: '9999',
-      background: '#111827',
-      color: '#fff',
-      padding: '10px 14px',
-      borderRadius: '10px',
-      font: '12px Arial, sans-serif',
-      boxShadow: '0 12px 30px rgba(0,0,0,.22)'
+      position: 'fixed', right: '20px', bottom: '20px', zIndex: '9999',
+      background: '#111827', color: '#fff', padding: '10px 14px', borderRadius: '10px',
+      font: '12px Arial, sans-serif', boxShadow: '0 12px 30px rgba(0,0,0,.22)'
     });
     document.body.appendChild(el);
-    window.setTimeout(() => el.remove(), 2600);
+    window.setTimeout(() => el.remove(), 3200);
   }
 
   function normalizeSignature(body) {
@@ -142,35 +165,149 @@
     const body = normalizeSignature(bodyEl?.textContent || '');
 
     let contactText = '';
-    if (summary) {
-      const paragraphs = $$('p', summary);
-      contactText = paragraphs.map((p) => p.textContent || '').join(' ');
-    }
+    if (summary) contactText = $$('p', summary).map((p) => p.textContent || '').join(' ');
 
     let to = extractEmail(contactText);
     if (!to && id) {
       const seedLetter = window.INTENTRA_CRM_SEED?.letters?.find((item) => item.id === id);
       if (seedLetter) to = extractEmail(seedLetter.contact);
     }
-
     return { id, to, subject, body, bodyEl, card };
   }
 
   async function postMessage(token, data) {
     return fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ raw: buildRawMessage(data.to, data.subject, data.body) }),
     });
+  }
+
+  function pushActivity(state, type, text, relatedId = '', at = new Date().toISOString()) {
+    state.activity = Array.isArray(state.activity) ? state.activity : [];
+    state.activity.unshift({ at, type, text, relatedId });
+    state.activity = state.activity.slice(0, 300);
+  }
+
+  function findLetterAndContact(state, data) {
+    const stateLetter = Array.isArray(state.letters)
+      ? state.letters.find((item) => item.id === data.id)
+      : null;
+    const seedLetter = window.INTENTRA_CRM_SEED?.letters?.find((item) => item.id === data.id);
+    const contactId = stateLetter?.contactId || seedLetter?.contactId || '';
+    let contact = Array.isArray(state.contacts) ? state.contacts.find((item) => item.id === contactId) : null;
+    if (!contact && data.to) {
+      contact = state.contacts?.find((item) => String(item.email || '').toLowerCase() === data.to.toLowerCase()) || null;
+    }
+    return { stateLetter, seedLetter, contact };
+  }
+
+  function moveContactForward(state, contact, targetStage, reason, at) {
+    if (!contact || !targetStage || contact.stage === 'paused') return false;
+    const currentIndex = STAGES.indexOf(contact.stage);
+    const targetIndex = STAGES.indexOf(targetStage);
+    if (targetIndex < 0 || currentIndex < 0 || currentIndex >= targetIndex) return false;
+    const from = contact.stage;
+    contact.stage = targetStage;
+    contact.history = Array.isArray(contact.history) ? contact.history : [];
+    contact.history.push({ from, to: targetStage, at, reason });
+    pushActivity(state, 'stage', `${contact.name}: ${from} → ${targetStage}. ${reason}`, contact.id, at);
+    return true;
+  }
+
+  function findLinkedTask(state, data, contact) {
+    const mappedId = LETTER_TASK_MAP[data.id];
+    if (mappedId) {
+      const mapped = state.tasks?.find((task) => task.id === mappedId);
+      if (mapped && !TERMINAL_TASKS.has(mapped.status)) return mapped;
+    }
+    if (!contact) return null;
+    const candidates = (state.tasks || [])
+      .filter((task) => task.contactId === contact.id && !TERMINAL_TASKS.has(task.status))
+      .filter((task) => /письм|отправ|e-mail|email|интро|встреч/i.test([task.title, task.action, task.channel].join(' ')))
+      .sort((a, b) => Number(a.number || 999) - Number(b.number || 999));
+    return candidates[0] || null;
+  }
+
+  function syncEmailToCRM(data, options = {}) {
+    let state;
+    try {
+      state = JSON.parse(localStorage.getItem(CRM_STORAGE_KEY) || 'null');
+    } catch (_) {
+      state = null;
+    }
+    if (!state || typeof state !== 'object') return null;
+
+    const at = options.at || new Date().toISOString();
+    const { contact } = findLetterAndContact(state, data);
+    const task = findLinkedTask(state, data, contact);
+    const targetStage = LETTER_STAGE_MAP[data.id] || 'waiting';
+    const method = options.method || 'gmail';
+    const methodLabel = method === 'gmail' ? 'Gmail' : 'вручную';
+
+    state.letterStatus = state.letterStatus && typeof state.letterStatus === 'object' ? state.letterStatus : {};
+    state.letterStatus[data.id] = {
+      ...(state.letterStatus[data.id] || {}),
+      sentAt: at,
+      method,
+      to: data.to,
+      subject: data.subject,
+      sentBody: data.body,
+      gmailMessageId: options.gmailMessageId || state.letterStatus[data.id]?.gmailMessageId || '',
+    };
+
+    state.emailHistory = Array.isArray(state.emailHistory) ? state.emailHistory : [];
+    state.emailHistory.unshift({
+      at,
+      letterId: data.id,
+      contactId: contact?.id || '',
+      taskId: task?.id || '',
+      method,
+      to: data.to,
+      subject: data.subject,
+      gmailMessageId: options.gmailMessageId || '',
+    });
+    state.emailHistory = state.emailHistory.slice(0, 300);
+
+    if (contact) {
+      contact.lastContactAt = at;
+      contact.lastContactChannel = method === 'gmail' ? 'Gmail' : 'E-mail';
+      contact.lastContactEmail = data.to;
+      contact.lastContactSubject = data.subject;
+      moveContactForward(state, contact, targetStage, `Письмо отправлено ${methodLabel}: «${data.subject}»`, at);
+    }
+
+    if (task && !TERMINAL_TASKS.has(task.status)) {
+      task.status = 'waiting';
+      task.lastActivityAt = at;
+      task.lastEmailAt = at;
+      task.lastEmailSubject = data.subject;
+      task.lastEmailTo = data.to;
+      const note = `${todayISO()}: письмо отправлено ${methodLabel} на ${data.to}. Ожидаем ответ. Тема: ${data.subject}`;
+      task.comment = task.comment ? `${task.comment}\n${note}` : note;
+      pushActivity(state, 'task_waiting', `Задача переведена в «Ожидаем»: ${task.title}`, task.id, at);
+    }
+
+    pushActivity(
+      state,
+      'email_sent',
+      `Отправлено письмо ${methodLabel}: ${data.to}. Тема: ${data.subject}`,
+      contact?.id || data.id,
+      at
+    );
+    state.updatedAt = at;
+    localStorage.setItem(CRM_STORAGE_KEY, JSON.stringify(state));
+
+    return {
+      contactName: contact?.shortName || contact?.name || '',
+      taskTitle: task?.title || '',
+      targetStage,
+    };
   }
 
   function ensureComposeDialog() {
     let dialog = $('#gmail-compose-modal');
     if (dialog) return dialog;
-
     dialog = document.createElement('dialog');
     dialog.id = 'gmail-compose-modal';
     dialog.className = 'modal';
@@ -185,7 +322,7 @@
           <label class="field field-wide"><span>Тема *</span><input name="subject" required maxlength="300"></label>
           <label class="field field-wide"><span>Текст письма *</span><textarea name="body" rows="18" required style="min-height:360px;line-height:1.5;resize:vertical"></textarea></label>
         </div>
-        <div style="padding:0 22px 4px;color:#697386;font-size:11px">Письмо не отправляется автоматически. Оно уйдет только после нажатия кнопки «Отправить письмо» менеджером.</div>
+        <div style="padding:0 22px 4px;color:#697386;font-size:11px">После отправки CRM автоматически зафиксирует письмо, переведет связанную задачу в «Ожидаем» и обновит этап ЛПР. Письмо уйдет только после нажатия менеджером кнопки ниже.</div>
         <div class="modal-actions">
           <button class="button button-soft" type="button" data-gmail-close>Отмена</button>
           <button class="button button-primary" type="submit" id="gmail-send-confirm">Отправить письмо</button>
@@ -199,31 +336,22 @@
         if (dialog.open) dialog.close();
       });
     });
-
     dialog.addEventListener('cancel', () => { composeContext = null; });
 
     $('#gmail-compose-form', dialog).addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!composeContext) return;
-
       const form = event.currentTarget;
       const subject = form.elements.subject.value.trim();
       const body = form.elements.body.value.trim();
-      if (!subject || !body) {
-        toast('Заполните тему и текст письма');
-        return;
-      }
+      if (!subject || !body) return toast('Заполните тему и текст письма');
 
       const sendButton = $('#gmail-send-confirm', dialog);
       sendButton.disabled = true;
       sendButton.textContent = 'Отправляем...';
 
       try {
-        const message = {
-          ...composeContext.data,
-          subject,
-          body,
-        };
+        const message = { ...composeContext.data, subject, body };
         let token = accessToken || await ensureToken();
         let response = await postMessage(token, message);
         if (response.status === 401) {
@@ -232,48 +360,45 @@
           response = await postMessage(token, message);
         }
         if (!response.ok) throw new Error(`GMAIL_API_${response.status}`);
+        let gmailResult = {};
+        try { gmailResult = await response.json(); } catch (_) {}
 
-        const sentToggle = $('[data-toggle-letter-sent]', composeContext.card);
-        if (sentToggle && /Отметить отправленным/i.test(sentToggle.textContent || '')) sentToggle.click();
+        const syncResult = syncEmailToCRM(message, {
+          method: 'gmail',
+          gmailMessageId: gmailResult.id || '',
+        });
 
         if (dialog.open) dialog.close();
-        toast(`Письмо отправлено: ${message.to}`);
         composeContext = null;
+        const processText = syncResult?.taskTitle
+          ? 'Задача переведена в «Ожидаем», воронка и история обновлены.'
+          : 'Воронка и история CRM обновлены.';
+        toast(`Письмо отправлено: ${message.to}. ${processText}`);
+        window.setTimeout(() => window.location.reload(), 1200);
       } catch (error) {
         console.error('Gmail send failed', error);
         if (error.message === 'GMAIL_NOT_CONFIGURED') {
           openSettings();
           toast('Сначала укажите Google OAuth Client ID');
-        } else {
-          toast('Не удалось отправить письмо через Gmail');
-        }
+        } else toast('Не удалось отправить письмо через Gmail');
       } finally {
         sendButton.disabled = false;
         sendButton.textContent = 'Отправить письмо';
       }
     });
-
     return dialog;
   }
 
   function openCompose(card) {
     const data = getLetterDataFromCard(card);
-    if (!data) {
-      toast('Не удалось прочитать письмо');
-      return;
-    }
-    if (!data.to) {
-      toast('У этого письма нет e-mail получателя');
-      return;
-    }
-
+    if (!data) return toast('Не удалось прочитать письмо');
+    if (!data.to) return toast('У этого письма нет e-mail получателя');
     const dialog = ensureComposeDialog();
     const form = $('#gmail-compose-form', dialog);
     form.elements.to.value = data.to;
     form.elements.subject.value = data.subject;
     form.elements.body.value = data.body;
     composeContext = { card, data };
-
     if (typeof dialog.showModal === 'function') dialog.showModal();
     else dialog.setAttribute('open', '');
     window.setTimeout(() => form.elements.subject.focus(), 50);
@@ -301,11 +426,7 @@
       button.addEventListener('click', openSettings);
       actions.prepend(button);
     }
-    button.textContent = !getClientId()
-      ? 'Подключить Gmail'
-      : accessToken
-        ? 'Gmail подключен'
-        : 'Gmail настроен';
+    button.textContent = !getClientId() ? 'Подключить Gmail' : accessToken ? 'Gmail подключен' : 'Gmail настроен';
     button.title = 'Gmail отправляет письмо только после явного нажатия менеджером';
   }
 
@@ -315,7 +436,6 @@
     if (!copyButton) return;
     const data = getLetterDataFromCard(card);
     if (data?.bodyEl) data.bodyEl.textContent = data.body;
-
     const container = copyButton.parentElement;
     if (!container) return;
     const button = document.createElement('button');
@@ -324,9 +444,7 @@
     button.dataset.sendGmail = data?.id || 'rendered';
     button.textContent = data?.to ? 'Отправить из Gmail' : 'Нет e-mail';
     button.disabled = !data?.to;
-    button.title = data?.to
-      ? `Открыть редактор письма для ${data.to}`
-      : 'В карточке письма не найден e-mail';
+    button.title = data?.to ? `Открыть редактор письма для ${data.to}` : 'В карточке письма не найден e-mail';
     button.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -369,6 +487,22 @@
     event.stopImmediatePropagation();
     copyNormalizedLetter(card);
   }, true);
+
+  document.addEventListener('click', (event) => {
+    const sentButton = event.target.closest?.('[data-toggle-letter-sent]');
+    if (!sentButton || !/Отметить отправленным/i.test(sentButton.textContent || '')) return;
+    const card = sentButton.closest('.material-card');
+    if (!card) return;
+    const data = getLetterDataFromCard(card);
+    if (!data) return;
+    window.setTimeout(() => {
+      const result = syncEmailToCRM(data, { method: 'manual' });
+      if (result) {
+        toast('Отправка зафиксирована: задача, воронка и история обновлены');
+        window.setTimeout(() => window.location.reload(), 900);
+      }
+    }, 120);
+  });
 
   function init() {
     refreshGmailStatus();
