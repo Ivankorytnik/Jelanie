@@ -2,9 +2,10 @@
   'use strict';
 
   const CLIENT_ID_KEY = 'intentraSpace.gmail.clientId';
+  const SIGNATURE_KEY = 'intentraSpace.gmail.signature';
   const CRM_STORAGE_KEY = 'intentraSpace.crm.route1_1.v3';
   const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
-  const SIGNATURE = 'С уважением,\nРуководитель проекта - Корытник Иван Анатольевич\nINTENTRA SPACE';
+  const DEFAULT_SIGNATURE = 'С уважением,\nРуководитель проекта - Корытник Иван Анатольевич\nINTENTRA SPACE\n+79651813649';
   const MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024;
   const TERMINAL_TASKS = new Set(['done', 'cancelled']);
   const STAGES = ['queued', 'contacted', 'waiting', 'connected', 'technical', 'meeting_proposed', 'meeting_scheduled', 'decision', 'paused'];
@@ -61,7 +62,16 @@
     window.setTimeout(() => el.remove(), 3200);
   }
 
-  function normalizeSignature(body) {
+  function getSignature() {
+    const saved = localStorage.getItem(SIGNATURE_KEY);
+    return saved === null ? DEFAULT_SIGNATURE : saved;
+  }
+
+  function setSignature(value) {
+    localStorage.setItem(SIGNATURE_KEY, String(value ?? '').trim());
+  }
+
+  function stripSignature(body) {
     let clean = String(body || '').trim();
     const markers = ['\nС уважением,', '\r\nС уважением,', 'С уважением,'];
     let cut = -1;
@@ -70,7 +80,13 @@
       if (pos >= 0 && (cut < 0 || pos < cut)) cut = pos;
     });
     if (cut >= 0) clean = clean.slice(0, cut).trimEnd();
-    return `${clean}\n\n${SIGNATURE}`;
+    return clean;
+  }
+
+  function normalizeSignature(body, signature = getSignature()) {
+    const clean = stripSignature(body);
+    const currentSignature = String(signature ?? '').trim();
+    return currentSignature ? `${clean}\n\n${currentSignature}` : clean;
   }
 
   function extractEmail(text) {
@@ -450,7 +466,9 @@
         <div class="form-grid">
           <label class="field field-wide"><span>Кому</span><input name="to" type="email" readonly></label>
           <label class="field field-wide"><span>Тема *</span><input name="subject" required maxlength="300"></label>
-          <label class="field field-wide"><span>Текст письма *</span><textarea name="body" rows="15" required style="min-height:300px;line-height:1.5;resize:vertical"></textarea></label>
+          <label class="field field-wide"><span>Текст письма *</span><textarea name="body" rows="12" required style="min-height:250px;line-height:1.5;resize:vertical"></textarea></label>
+          <label class="field field-wide"><span>Подпись</span><textarea name="signature" rows="4" style="min-height:100px;line-height:1.45;resize:vertical"></textarea><small style="display:block;margin-top:6px;color:#697386">Подпись можно изменить перед отправкой.</small></label>
+          <label class="field field-wide" style="display:flex;align-items:center;gap:8px;flex-direction:row"><input name="saveSignature" type="checkbox" style="width:auto"><span>Сохранить подпись для следующих писем</span></label>
           <div class="field field-wide">
             <span>Вложения</span>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:7px">
@@ -503,8 +521,9 @@
       if (!composeContext) return;
       const form = event.currentTarget;
       const subject = form.elements.subject.value.trim();
-      const body = form.elements.body.value.trim();
-      if (!subject || !body) return toast('Заполните тему и текст письма');
+      const bodyText = form.elements.body.value.trim();
+      const signature = form.elements.signature.value.trim();
+      if (!subject || !bodyText) return toast('Заполните тему и текст письма');
 
       const totalBytes = selectedAttachments.reduce((sum, file) => sum + Number(file.size || 0), 0);
       if (totalBytes > MAX_ATTACHMENT_BYTES) return toast('Суммарный размер вложений не должен превышать 20 МБ');
@@ -514,10 +533,11 @@
       sendButton.textContent = selectedAttachments.length ? 'Готовим вложения...' : 'Отправляем...';
 
       try {
+        if (form.elements.saveSignature.checked) setSignature(signature);
         const message = {
           ...composeContext.data,
           subject,
-          body,
+          body: signature ? `${bodyText}\n\n${signature}` : bodyText,
           attachments: selectedAttachments.slice(),
         };
         let token = accessToken || await ensureToken();
@@ -572,7 +592,9 @@
     const form = $('#gmail-compose-form', dialog);
     form.elements.to.value = data.to;
     form.elements.subject.value = data.subject;
-    form.elements.body.value = data.body;
+    form.elements.body.value = stripSignature(data.body);
+    form.elements.signature.value = getSignature();
+    form.elements.saveSignature.checked = false;
     resetAttachments();
     composeContext = { card, data };
     if (typeof dialog.showModal === 'function') dialog.showModal();
@@ -640,7 +662,7 @@
     if (!data) return;
     try {
       await navigator.clipboard.writeText(data.body);
-      toast('Письмо скопировано с новой подписью');
+      toast('Письмо скопировано с подписью');
     } catch (_) {
       const area = document.createElement('textarea');
       area.value = data.body;
@@ -650,7 +672,7 @@
       area.select();
       document.execCommand('copy');
       area.remove();
-      toast('Письмо скопировано с новой подписью');
+      toast('Письмо скопировано с подписью');
     }
   }
 
