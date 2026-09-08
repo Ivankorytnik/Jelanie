@@ -288,7 +288,6 @@
 
   .section-dark .process::before {
     height: 214px;
-    background-position: center;
   }
 
   .section-dark .process-step {
@@ -354,4 +353,38 @@
     padding: 4px 7px;
     font-size: 7px;
   }
+}
+
+/* Test stand: remove all visible RT-64 references without changing production. */
+body:has(.test-stand-badge) .hero-visual::after {
+  content: "КОНЦЕПЦИЯ ПЕРЕДАЧИ";
+}
+
+body:has(.test-stand-badge) .hero-copy .transmission-status > span:last-child {
+  display: none;
+}
+
+body:has(.test-stand-badge) #technology .technology-copy > p {
+  font-size: 0;
+}
+
+body:has(.test-stand-badge) #technology .technology-copy > p::after {
+  content: "Для первой передачи рассматривается инфраструктура дальней космической связи. Конкретная площадка, дата, частота и режим передачи появятся на сайте только после письменного подтверждения технического оператора.";
+  display: block;
+  color: #9aa6b8;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+body:has(.test-stand-badge) #technology .tech-metrics > div:first-child strong {
+  font-size: 0;
+}
+
+body:has(.test-stand-badge) #technology .tech-metrics > div:first-child strong::after {
+  content: "ДАЛЬНЯЯ СВЯЗЬ";
+  font-size: 10px;
+}
+
+body:has(.test-stand-badge) #faq .faq > details:nth-child(3) {
+  display: none;
 }
