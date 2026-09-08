@@ -14,36 +14,93 @@
     try {
       const response = await fetch('../index.html?test-source=' + Date.now(), {cache:'no-store'});
       if (!response.ok) throw new Error('Не удалось загрузить production: ' + response.status);
-      let html = await response.text();
+      const source = await response.text();
+      const doc = new DOMParser().parseFromString(source, 'text/html');
 
-      const testCss = `
-<style id="test-stand-styles">
-.test-stand-badge{position:fixed;right:16px;bottom:16px;z-index:120;padding:8px 12px;border:1px solid rgba(104,231,255,.3);border-radius:999px;background:rgba(7,11,18,.92);backdrop-filter:blur(16px);color:#bfefff;font-size:9px;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 12px 40px rgba(0,0,0,.28)}
-.test-new{position:relative}.test-new:before{content:'TEST';position:absolute;top:14px;right:14px;z-index:2;padding:4px 7px;border:1px solid rgba(104,231,255,.25);border-radius:999px;color:#9eefff;font-size:8px;letter-spacing:.14em;background:rgba(5,7,12,.72)}
-.test-scenarios,.test-ritual,.test-registry{display:grid;gap:18px}.test-scenarios{grid-template-columns:repeat(3,minmax(0,1fr))}.test-ritual{grid-template-columns:repeat(5,minmax(0,1fr))}.test-card{padding:24px;border:1px solid rgba(148,163,184,.16);border-radius:20px;background:rgba(12,17,28,.66)}.test-card h3{margin:9px 0 10px}.test-mini{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#7edfff}.test-id{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;padding:28px;border:1px solid rgba(104,231,255,.2);border-radius:24px;background:linear-gradient(135deg,rgba(104,231,255,.06),rgba(125,109,255,.06))}.test-id-code{font-size:clamp(22px,3vw,32px);letter-spacing:.08em;margin:8px 0 12px}.test-statuses{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.test-status{padding:7px 10px;border:1px solid rgba(148,163,184,.18);border-radius:999px;font-size:10px;letter-spacing:.08em}.test-route{font-size:clamp(26px,4vw,52px);line-height:1.08;margin:14px 0 18px}.test-registry-row{display:grid;grid-template-columns:1fr 1.3fr .7fr;gap:14px;padding:14px 0;border-bottom:1px solid rgba(148,163,184,.12)}.test-registry-row:last-child{border-bottom:0}.test-gift{padding:30px;border:1px solid rgba(125,109,255,.2);border-radius:24px;background:rgba(14,18,32,.7)}
-@media(max-width:900px){.test-scenarios,.test-ritual{grid-template-columns:1fr 1fr}.test-id{grid-template-columns:1fr}}
-@media(max-width:620px){.test-scenarios,.test-ritual{grid-template-columns:1fr}.test-registry-row{grid-template-columns:1fr}.test-stand-badge{right:8px;bottom:8px}}
-</style>`;
+      doc.title = 'Желание сквозь Вселенную — TEST';
+      const css = doc.querySelector('link[rel="stylesheet"]');
+      if (css) css.href = '../style.css';
+      doc.querySelectorAll('script[src]').forEach((s) => {
+        if (s.getAttribute('src') === 'script.js') s.setAttribute('src', '../script.js');
+      });
+      doc.querySelectorAll('link[rel~="icon"]').forEach((n) => n.remove());
+      const icon = doc.createElement('link');
+      icon.rel = 'icon'; icon.type = 'image/svg+xml'; icon.href = '../favicon-test.svg';
+      doc.head.appendChild(icon);
 
-      const additions = `
-<section class="section section-dark test-new" id="test-scenarios"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Новые продуктовые механики · TEST</span><h2>Три сценария одного проекта</h2><p>Весь основной проект остаётся прежним. Ниже — дополнительные способы войти в него.</p></div><div class="test-scenarios reveal"><article class="test-card"><span class="test-mini">Для себя</span><h3>Отправить своё желание</h3><p>Личное послание, EEG-отпечаток момента, выбранная звезда и собственный Universe ID.</p><button class="button button-ghost js-open-builder" type="button">Создать сигнал</button></article><article class="test-card"><span class="test-mini">В подарок</span><h3>Подарить космический сигнал</h3><p>Персональная страница получателя, повод, послание, выбранная цель и статус передачи.</p><a class="button button-ghost" href="#test-gift">Посмотреть механику</a></article><article class="test-card"><span class="test-mini">Для события / бренда</span><h3>Общий сигнал события</h3><p>Свадьба, юбилей, фестиваль или бренд-проект: несколько персональных сообщений объединяются в одну миссию.</p><a class="button button-ghost" href="#test-mission">Посмотреть миссию</a></article></div></div></section>
-<section class="section test-new" id="test-ritual"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Ритуал фиксации момента · TEST</span><h2>EEG становится частью события</h2><p>Не отдельная техническая процедура, а понятная последовательность действий.</p></div><div class="test-ritual reveal"><article class="test-card"><span class="test-mini">01</span><h3>Сформулируйте</h3><p>Запишите желание или послание своими словами.</p></article><article class="test-card"><span class="test-mini">02</span><h3>Выберите звезду</h3><p>Определите направление, расстояние и смысл цели.</p></article><article class="test-card"><span class="test-mini">03</span><h3>Наденьте EEG</h3><p>Гарнитура готовится к фиксации характеристик момента.</p></article><article class="test-card"><span class="test-mini">04</span><h3>Сконцентрируйтесь</h3><p>20 секунд внимания только на выбранной мысли.</p></article><article class="test-card"><span class="test-mini">05</span><h3>Получите ID</h3><p>Текст, время, EEG и цель объединяются в цифровой артефакт.</p></article></div></div></section>
-<section class="section section-dark test-new" id="test-universe-id"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Главный артефакт · TEST</span><h2>Universe ID — космический паспорт желания</h2><p>Он связывает личный момент, данные и подтверждаемое техническое действие.</p></div><div class="test-id reveal"><div><span class="test-mini">UNIVERSE ID</span><div class="test-id-code">UNV-2026-000184</div><h3>«То, что важно именно сейчас»</h3><p>Имя или псевдоним · дата и время · EEG-отпечаток · выбранная звезда · координаты · цифровой хеш.</p><div class="test-statuses"><span class="test-status">PREPARED</span><span class="test-status">SCHEDULED</span><span class="test-status">TRANSMITTED</span></div></div><article class="test-card"><span class="test-mini">Цель</span><h3>HD 20794</h3><p>В карточке сохраняются координаты цели, параметры пакета и подтверждение фактического сеанса.</p><p><strong>Приватность:</strong> публикация в реестре — только по согласию владельца.</p></article></div></div></section>
-<section class="section test-new" id="test-mission"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Ощущение реальной миссии · TEST</span><h2>Куда направлен сигнал</h2></div><article class="test-card reveal"><span class="test-mini">Маршрут</span><div class="test-route">Земля → радиотелескоп → HD 20794</div><p>После подтверждённого сеанса здесь могут отображаться фактические дата и время передачи, направление, параметры пакета и статус миссии.</p><div class="transmission-status"><span class="status-pulse"></span><span><strong>Следующее окно передачи:</strong> формируется после технического согласования</span></div></article></div></section>
-<section class="section section-dark test-new" id="test-gift"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Подарочный сценарий · TEST</span><h2>Подарить желание</h2></div><div class="test-gift reveal"><span class="test-mini">Персональная страница получателя</span><h3>«Мария, для тебя создан сигнал во Вселенную»</h3><p>Даритель выбирает повод, пишет послание и направление. Получатель видит персональную страницу, Universe ID, цель и статус будущей передачи.</p><div class="hero-actions"><button class="button button-gradient js-open-builder" type="button" data-gift="true">Создать подарок</button><a class="button button-ghost" href="#test-universe-id">Посмотреть Universe ID</a></div></div></div></section>
-<section class="section test-new" id="test-registry"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Публичный реестр · TEST</span><h2>Universe Registry</h2><p>Показывает факт существования сигнала. Имя и текст желания раскрываются только по выбору владельца.</p></div><div class="test-card reveal"><div class="test-registry-row"><strong>UNV-2026-000184</strong><span>Москва → HD 20794</span><span>PREPARED</span></div><div class="test-registry-row"><strong>UNV-2026-000185</strong><span>Санкт-Петербург → TRAPPIST-1</span><span>PREPARED</span></div><div class="test-registry-row"><strong>UNV-2026-000186</strong><span>Казань → Polaris</span><span>SCHEDULED</span></div></div></div></section>
-<section class="section section-dark test-new" id="test-principle"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Принцип проекта · TEST</span><h2>Не обещаем исполнение желания</h2><p>Мы фиксируем момент, создаём цифровой пакет, присваиваем Universe ID и после технического согласования включаем его в направленную радиопередачу.</p></div></div></section>`;
+      const style = doc.createElement('style');
+      style.textContent = `
+        .test-stand-badge{position:fixed;right:16px;bottom:16px;z-index:120;padding:8px 12px;border:1px solid rgba(104,231,255,.3);border-radius:999px;background:rgba(7,11,18,.92);backdrop-filter:blur(16px);color:#bfefff;font-size:9px;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 12px 40px rgba(0,0,0,.28)}
+        .test-inline-label{display:inline-flex;margin-left:8px;padding:3px 6px;border:1px solid rgba(104,231,255,.22);border-radius:999px;color:#9eefff;font-size:8px;letter-spacing:.12em;vertical-align:middle}
+        .audience-section .audience-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .mission-card,.registry-card{padding:28px;border:1px solid rgba(148,163,184,.16);border-radius:22px;background:rgba(12,17,28,.66)}
+        .mission-route{font-size:clamp(26px,4vw,50px);line-height:1.08;margin:14px 0 20px}
+        .registry-row{display:grid;grid-template-columns:1fr 1.3fr .7fr;gap:14px;padding:14px 0;border-bottom:1px solid rgba(148,163,184,.12)}
+        .registry-row:last-child{border-bottom:0}
+        @media(max-width:820px){.audience-section .audience-grid{grid-template-columns:1fr}.registry-row{grid-template-columns:1fr}}
+      `;
+      doc.head.appendChild(style);
 
-      html = html.replace('<link rel="stylesheet" href="style.css">','<link rel="stylesheet" href="../style.css">');
-      html = html.replace('<title>Желание сквозь Вселенную</title>', '<title>Желание сквозь Вселенную — TEST</title><link rel="icon" href="../favicon-test.svg" type="image/svg+xml">');
-      html = html.replace('</head>', testCss + '\n</head>');
-      html = html.replace('</main>', additions + '\n</main>');
-      html = html.replace('</body>', '<div class="test-stand-badge">TEST / production + механики</div>\n</body>');
-      html = html.replace('<a href="#faq">FAQ</a>', '<a href="#faq">FAQ</a><a href="#test-scenarios">TEST-механики</a>');
-      html = html.replace('<scr' + 'ipt src="script.js"></scr' + 'ipt>', '<scr' + 'ipt src="../script.js"></scr' + 'ipt>');
+      const nav = doc.querySelector('.main-nav');
+      if (nav) nav.innerHTML = '<a href="#how">Как это работает</a><a href="#scenarios">Сценарии</a><a href="#formats">Форматы</a><a href="#technology">Передатчик</a><a href="#certificate">Universe ID</a><a href="#faq">FAQ</a>';
+
+      const howHeading = doc.querySelector('#how .section-heading');
+      if (howHeading) howHeading.innerHTML = '<span class="section-kicker">Один последовательный путь</span><h2>Как желание становится космическим сигналом</h2><p>От личной мысли до Universe ID и подготовленного радиосеанса — без лишних повторов и параллельных сценариев.</p>';
+      const process = doc.querySelector('#how .process');
+      if (process) process.innerHTML = `
+        <article class="process-step"><span class="step-number">01</span><span class="process-symbol">✎</span><h3>Сформулируйте</h3><p>Запишите желание, мысль или личное послание своими словами.</p></article>
+        <span class="process-line" aria-hidden="true"></span>
+        <article class="process-step"><span class="step-number">02</span><span class="process-symbol">✦</span><h3>Выберите цель</h3><p>Определите звезду — направление, расстояние и смысл будущей передачи.</p></article>
+        <span class="process-line" aria-hidden="true"></span>
+        <article class="process-step"><span class="step-number">03</span><span class="process-symbol">⌁</span><h3>Зафиксируйте момент</h3><p>Во время короткой концентрации EEG-гарнитура записывает характеристики состояния.</p></article>
+        <span class="process-line" aria-hidden="true"></span>
+        <article class="process-step"><span class="step-number">04</span><span class="process-symbol">0101</span><h3>Получите Universe ID</h3><p>Текст, EEG, время, цель и цифровой хеш объединяются в единый пакет.</p></article>
+        <span class="process-line" aria-hidden="true"></span>
+        <article class="process-step"><span class="step-number">05</span><span class="process-symbol">↗</span><h3>Передайте сигнал</h3><p>После технического согласования пакет включается в направленный радиосеанс, а статус фиксируется в сертификате.</p></article>`;
+
+      const audience = doc.querySelector('.audience-section');
+      if (audience) {
+        audience.id = 'scenarios';
+        audience.querySelector('.section-heading').innerHTML = '<span class="section-kicker">Сценарии участия</span><h2>Один проект — три понятных способа участия</h2><p>Вы выбираете не другую технологию, а контекст, в котором хотите прожить этот опыт.</p>';
+        audience.querySelector('.audience-grid').innerHTML = `
+          <article><span>♡</span><strong>Для себя</strong><p>Зафиксировать важную мысль, желание или начало нового этапа и получить собственный Universe ID.</p><button class="footer-link-button js-open-builder" type="button">Создать свой сигнал</button></article>
+          <article><span>♢</span><strong>В подарок</strong><p>Создать персональное космическое послание для близкого человека с его страницей и сертификатом.</p><button class="footer-link-button js-open-builder" type="button" data-gift="true">Подготовить подарок</button></article>
+          <article><span>∞</span><strong>Для события / бренда</strong><p>Объединить несколько персональных сообщений в одну общую космическую миссию.</p><button class="footer-link-button js-open-builder" type="button">Собрать сигнал</button></article>`;
+        const formats = doc.querySelector('#formats');
+        if (formats && formats.parentNode) formats.parentNode.insertBefore(audience, formats);
+      }
+
+      const technology = doc.querySelector('#technology');
+      if (technology) {
+        const mission = doc.createElement('section');
+        mission.className = 'section section-dark';
+        mission.id = 'mission';
+        mission.innerHTML = `<div class="container"><div class="section-heading reveal"><span class="section-kicker">После формирования пакета</span><h2>Куда направлен сигнал</h2><p>Здесь показывается именно технический маршрут передачи, а не повтор механики создания желания.</p></div><div class="mission-card reveal"><span class="section-kicker">Маршрут сигнала <span class="test-inline-label">TEST</span></span><div class="mission-route">Земля → передающая антенна → выбранная звезда</div><p>После подтверждённого сеанса этот блок будет показывать фактические дату и время, антенну, направление, параметры пакета и статус передачи.</p><div class="transmission-status"><span class="status-pulse"></span><span><strong>Следующее окно передачи:</strong> появится только после технического согласования</span></div></div></div>`;
+        technology.insertAdjacentElement('afterend', mission);
+      }
+
+      const certCopy = doc.querySelector('#certificate .certificate-copy');
+      if (certCopy) certCopy.innerHTML = `<span class="section-kicker">Главный цифровой артефакт</span><h2>Universe ID — космический паспорт желания</h2><p>Universe ID связывает весь путь в одну сущность: личное послание, EEG-отпечаток, выбранную цель, цифровой хеш и статус передачи. Сертификат — это визуальное подтверждение данных Universe ID.</p><ul class="check-list"><li>Уникальный ID сигнала</li><li>Текст и EEG-отпечаток момента</li><li>Координаты выбранной цели</li><li>SHA-256 для проверки целостности</li><li>Статус PREPARED → TRANSMITTED и фактические параметры сеанса</li></ul><button class="button button-outline js-open-builder" type="button">Создать Universe ID</button>`;
+
+      const certificate = doc.querySelector('#certificate');
+      if (certificate) {
+        const registry = doc.createElement('section');
+        registry.className = 'section section-dark';
+        registry.id = 'registry';
+        registry.innerHTML = `<div class="container"><div class="section-heading reveal"><span class="section-kicker">После создания Universe ID</span><h2>Universe Registry</h2><p>Публичный реестр подтверждает существование сигнала, но не раскрывает личное содержание без согласия владельца.</p></div><div class="registry-card reveal"><div class="registry-row"><strong>UNV-DEMO-000184</strong><span>Москва → HD 20794</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000185</strong><span>Санкт-Петербург → TRAPPIST-1</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000186</strong><span>Казань → Polaris</span><span>DEMO</span></div></div></div>`;
+        certificate.insertAdjacentElement('afterend', registry);
+      }
+
+      const footerProject = doc.querySelector('.footer-links > div:first-child');
+      if (footerProject) footerProject.innerHTML = '<strong>Проект</strong><a href="#how">Как работает</a><a href="#scenarios">Сценарии</a><a href="#formats">Форматы</a><a href="#technology">Технология</a>';
+
+      const badge = doc.createElement('div');
+      badge.className = 'test-stand-badge';
+      badge.textContent = 'TEST / единая логика';
+      doc.body.appendChild(badge);
 
       document.open();
-      document.write(html);
+      document.write('<!doctype html>' + doc.documentElement.outerHTML);
       document.close();
     } catch (e) {
       document.body.innerHTML = '<div style="min-height:100vh;background:#05070c;color:#fff;display:grid;place-items:center;padding:30px;font:16px system-ui"><div><h1>Тестовый стенд временно не загрузился</h1><p>' + String(e.message || e) + '</p><p><a style="color:#6de9ff" href="../">Открыть production</a></p></div></div>';
