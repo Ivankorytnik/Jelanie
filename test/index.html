@@ -40,14 +40,21 @@
         .test-art{position:relative;margin:26px auto 34px;overflow:hidden;width:min(680px,100%);border-radius:26px;border:1px solid rgba(104,231,255,.14);background:#07101c;box-shadow:0 30px 80px rgba(0,0,0,.38),0 0 55px rgba(86,133,255,.07)}
         .test-art img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;transform:scale(1.002)}
         .test-art:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 60%,rgba(5,7,12,.28)),linear-gradient(90deg,rgba(5,7,12,.12),transparent 28%,transparent 72%,rgba(5,7,12,.08))}
-        #scenarios .test-art,#formats .test-art,#mission .test-art,#registry .test-art{margin-inline:auto}
-        #faq .section-heading.compact{align-self:start}
-        #faq .test-art{margin-top:24px}
+        .test-side-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:32px;align-items:center;margin:10px 0 28px}
+        .test-side-layout.reverse{grid-template-columns:minmax(320px,.95fr) minmax(0,1.05fr)}
+        .test-side-layout .section-heading{margin:0;max-width:none;text-align:left;align-items:flex-start}
+        .test-side-layout .section-heading.compact{align-self:center}
+        .test-side-layout .section-heading p{max-width:640px}
+        .test-side-layout .test-art{margin:0;width:100%;max-width:none}
+        .test-side-layout.reverse .section-heading{order:2}
+        .test-side-layout.reverse .test-art{order:1}
+        #scenarios .audience-grid,#mission .mission-card,#registry .registry-card,#faq .faq-grid{margin-top:26px}
         #faq .test-art img{aspect-ratio:4/3}
-        .cta-section .cta-card{overflow:hidden}
-        .cta-section .test-art{grid-column:1/-1;margin:8px auto 0;width:min(760px,100%)}
-        .cta-section .test-art img{aspect-ratio:16/7}
-        @media(max-width:820px){.audience-section .audience-grid{grid-template-columns:1fr}.registry-row{grid-template-columns:1fr}.test-art{border-radius:20px;margin:20px 0 28px}.cta-section .test-art img,#faq .test-art img{aspect-ratio:16/9}}
+        .cta-section .cta-card{overflow:hidden;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:32px;align-items:center}
+        .cta-section .cta-card > *{min-width:0}
+        .cta-section .test-art{grid-column:auto;margin:0;width:100%;max-width:none;align-self:stretch}
+        .cta-section .test-art img{aspect-ratio:16/10;height:100%}
+        @media(max-width:820px){.audience-section .audience-grid{grid-template-columns:1fr}.registry-row{grid-template-columns:1fr}.test-art{border-radius:20px;margin:20px 0 28px}.test-side-layout,.test-side-layout.reverse,.cta-section .cta-card{grid-template-columns:1fr;gap:18px}.test-side-layout.reverse .section-heading,.test-side-layout.reverse .test-art{order:initial}.test-side-layout .section-heading{text-align:center;align-items:center}.test-side-layout .section-heading p{max-width:none}.cta-section .test-art img,#faq .test-art img{aspect-ratio:16/9;height:auto}}
       `;
       doc.head.appendChild(style);
 
@@ -70,7 +77,8 @@
       if (audience) {
         audience.id = 'scenarios';
         audience.querySelector('.section-heading').innerHTML = '<span class="section-kicker">Сценарии участия</span><h2>Один проект — три понятных способа участия</h2><p>Вы выбираете не другую технологию, а контекст, в котором хотите прожить этот опыт.</p>';
-        audience.querySelector('.section-heading').insertAdjacentHTML('afterend', art('../assets/test-scenarios.webp','Личное желание, подарок близкому и общий космический сигнал'));
+        audience.querySelector('.section-heading').insertAdjacentHTML('afterend', `<div class="test-side-layout reveal"><div class="section-heading compact"><span class="section-kicker">Сценарии участия</span><h2>Один проект — три понятных способа участия</h2><p>Вы выбираете не другую технологию, а контекст, в котором хотите прожить этот опыт.</p></div>${art('../assets/test-scenarios.webp','Личное желание, подарок близкому и общий космический сигнал')}</div>`);
+        audience.querySelector('.section-heading').remove();
         audience.querySelector('.audience-grid').innerHTML = `
           <article><span>♡</span><strong>Для себя</strong><p>Зафиксировать важную мысль, желание или начало нового этапа и получить собственный Universe ID.</p><button class="footer-link-button js-open-builder" type="button">Создать свой сигнал</button></article>
           <article><span>♢</span><strong>В подарок</strong><p>Создать персональное космическое послание для близкого человека с его страницей и сертификатом.</p><button class="footer-link-button js-open-builder" type="button" data-gift="true">Подготовить подарок</button></article>
@@ -87,7 +95,7 @@
         const mission = doc.createElement('section');
         mission.className = 'section section-dark';
         mission.id = 'mission';
-        mission.innerHTML = `<div class="container"><div class="section-heading reveal"><span class="section-kicker">После формирования пакета</span><h2>Куда направлен сигнал</h2><p>Здесь показывается именно технический маршрут передачи, а не повтор механики создания желания.</p></div>${art('../assets/test-mission.webp','Радиоантенна отправляет сигнал к выбранной звезде')}<div class="mission-card reveal"><span class="section-kicker">Маршрут сигнала <span class="test-inline-label">TEST</span></span><div class="mission-route">Земля → передающая антенна → выбранная звезда</div><p>После подтверждённого сеанса этот блок будет показывать фактические дату и время, антенну, направление, параметры пакета и статус передачи.</p><div class="transmission-status"><span class="status-pulse"></span><span><strong>Следующее окно передачи:</strong> появится только после технического согласования</span></div></div></div>`;
+        mission.innerHTML = `<div class="container"><div class="test-side-layout reveal"><div class="section-heading"><span class="section-kicker">После формирования пакета</span><h2>Куда направлен сигнал</h2><p>Здесь показывается именно технический маршрут передачи, а не повтор механики создания желания.</p></div>${art('../assets/test-mission.webp','Радиоантенна отправляет сигнал к выбранной звезде')}</div><div class="mission-card reveal"><span class="section-kicker">Маршрут сигнала <span class="test-inline-label">TEST</span></span><div class="mission-route">Земля → передающая антенна → выбранная звезда</div><p>После подтверждённого сеанса этот блок будет показывать фактические дату и время, антенну, направление, параметры пакета и статус передачи.</p><div class="transmission-status"><span class="status-pulse"></span><span><strong>Следующее окно передачи:</strong> появится только после технического согласования</span></div></div></div>`;
         technology.insertAdjacentElement('afterend', mission);
       }
 
@@ -99,15 +107,32 @@
         const registry = doc.createElement('section');
         registry.className = 'section section-dark';
         registry.id = 'registry';
-        registry.innerHTML = `<div class="container"><div class="section-heading reveal"><span class="section-kicker">После создания Universe ID</span><h2>Universe Registry</h2><p>Публичный реестр подтверждает существование сигнала, но не раскрывает личное содержание без согласия владельца.</p></div>${art('../assets/test-registry.webp','Космический архив и реестр уникальных сигналов')}<div class="registry-card reveal"><div class="registry-row"><strong>UNV-DEMO-000184</strong><span>Москва → HD 20794</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000185</strong><span>Санкт-Петербург → TRAPPIST-1</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000186</strong><span>Казань → Polaris</span><span>DEMO</span></div></div></div>`;
+        registry.innerHTML = `<div class="container"><div class="test-side-layout reverse reveal"><div class="section-heading"><span class="section-kicker">После создания Universe ID</span><h2>Universe Registry</h2><p>Публичный реестр подтверждает существование сигнала, но не раскрывает личное содержание без согласия владельца.</p></div>${art('../assets/test-registry.webp','Космический архив и реестр уникальных сигналов')}</div><div class="registry-card reveal"><div class="registry-row"><strong>UNV-DEMO-000184</strong><span>Москва → HD 20794</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000185</strong><span>Санкт-Петербург → TRAPPIST-1</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000186</strong><span>Казань → Polaris</span><span>DEMO</span></div></div></div>`;
         certificate.insertAdjacentElement('afterend', registry);
       }
 
       const faqHeading = doc.querySelector('#faq .section-heading');
-      if (faqHeading) faqHeading.insertAdjacentHTML('beforeend', art('../assets/test-faq.webp','Наблюдение за Вселенной и поиск ответов о проекте'));
+      if (faqHeading) faqHeading.insertAdjacentHTML('afterend', art('../assets/test-faq.webp','Наблюдение за Вселенной и поиск ответов о проекте'));
 
       const ctaCard = doc.querySelector('.cta-section .cta-card');
       if (ctaCard) ctaCard.insertAdjacentHTML('beforeend', art('../assets/test-cta.webp','Личное послание начинает путь к звёздам'));
+
+      const applySideLayout = (selector, reverse = false) => {
+        const section = doc.querySelector(selector);
+        if (!section) return;
+        const container = section.querySelector('.container');
+        const heading = section.querySelector('.section-heading');
+        const artEl = section.querySelector('.test-art');
+        if (!container || !heading || !artEl) return;
+        const layout = doc.createElement('div');
+        layout.className = 'test-side-layout reveal' + (reverse ? ' reverse' : '');
+        container.insertBefore(layout, heading);
+        layout.appendChild(heading);
+        layout.appendChild(artEl);
+      };
+
+      applySideLayout('#formats', true);
+      applySideLayout('#faq', false);
 
       const footerProject = doc.querySelector('.footer-links > div:first-child');
       if (footerProject) footerProject.innerHTML = '<strong>Проект</strong><a href="#how">Как работает</a><a href="#scenarios">Сценарии</a><a href="#formats">Форматы</a><a href="#technology">Технология</a>';
