@@ -37,9 +37,21 @@
         .mission-route{font-size:clamp(26px,4vw,50px);line-height:1.08;margin:14px 0 20px}
         .registry-row{display:grid;grid-template-columns:1fr 1.3fr .7fr;gap:14px;padding:14px 0;border-bottom:1px solid rgba(148,163,184,.12)}
         .registry-row:last-child{border-bottom:0}
-        @media(max-width:820px){.audience-section .audience-grid{grid-template-columns:1fr}.registry-row{grid-template-columns:1fr}}
+        .test-art{position:relative;margin:26px auto 34px;overflow:hidden;width:min(680px,100%);border-radius:26px;border:1px solid rgba(104,231,255,.14);background:#07101c;box-shadow:0 30px 80px rgba(0,0,0,.38),0 0 55px rgba(86,133,255,.07)}
+        .test-art img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;transform:scale(1.002)}
+        .test-art:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 60%,rgba(5,7,12,.28)),linear-gradient(90deg,rgba(5,7,12,.12),transparent 28%,transparent 72%,rgba(5,7,12,.08))}
+        #scenarios .test-art,#formats .test-art,#mission .test-art,#registry .test-art{margin-inline:auto}
+        #faq .section-heading.compact{align-self:start}
+        #faq .test-art{margin-top:24px}
+        #faq .test-art img{aspect-ratio:4/3}
+        .cta-section .cta-card{overflow:hidden}
+        .cta-section .test-art{grid-column:1/-1;margin:8px auto 0;width:min(760px,100%)}
+        .cta-section .test-art img{aspect-ratio:16/7}
+        @media(max-width:820px){.audience-section .audience-grid{grid-template-columns:1fr}.registry-row{grid-template-columns:1fr}.test-art{border-radius:20px;margin:20px 0 28px}.cta-section .test-art img,#faq .test-art img{aspect-ratio:16/9}}
       `;
       doc.head.appendChild(style);
+
+      const art = (src, alt, extra='') => `<figure class="test-art reveal ${extra}"><img src="${src}" alt="${alt}" loading="lazy" decoding="async"></figure>`;
 
       const nav = doc.querySelector('.main-nav');
       if (nav) nav.innerHTML = '<a href="#how">Как это работает</a><a href="#scenarios">Сценарии</a><a href="#formats">Форматы</a><a href="#technology">Передатчик</a><a href="#certificate">Universe ID</a><a href="#faq">FAQ</a>';
@@ -48,20 +60,17 @@
       if (howHeading) howHeading.innerHTML = '<span class="section-kicker">Один последовательный путь</span><h2>Как желание становится космическим сигналом</h2><p>От личной мысли до Universe ID и подготовленного радиосеанса — без лишних повторов и параллельных сценариев.</p>';
       const process = doc.querySelector('#how .process');
       if (process) process.innerHTML = `
-        <article class="process-step"><span class="step-number">01</span><span class="process-symbol">✎</span><h3>Сформулируйте</h3><p>Запишите желание, мысль или личное послание своими словами.</p></article>
-        <span class="process-line" aria-hidden="true"></span>
-        <article class="process-step"><span class="step-number">02</span><span class="process-symbol">✦</span><h3>Выберите цель</h3><p>Определите звезду — направление, расстояние и смысл будущей передачи.</p></article>
-        <span class="process-line" aria-hidden="true"></span>
-        <article class="process-step"><span class="step-number">03</span><span class="process-symbol">⌁</span><h3>Зафиксируйте момент</h3><p>Во время короткой концентрации EEG-гарнитура записывает характеристики состояния.</p></article>
-        <span class="process-line" aria-hidden="true"></span>
-        <article class="process-step"><span class="step-number">04</span><span class="process-symbol">0101</span><h3>Получите Universe ID</h3><p>Текст, EEG, время, цель и цифровой хеш объединяются в единый пакет.</p></article>
-        <span class="process-line" aria-hidden="true"></span>
+        <article class="process-step"><span class="step-number">01</span><span class="process-symbol">✎</span><h3>Сформулируйте</h3><p>Запишите желание, мысль или личное послание своими словами.</p></article><span class="process-line" aria-hidden="true"></span>
+        <article class="process-step"><span class="step-number">02</span><span class="process-symbol">✦</span><h3>Выберите цель</h3><p>Определите звезду — направление, расстояние и смысл будущей передачи.</p></article><span class="process-line" aria-hidden="true"></span>
+        <article class="process-step"><span class="step-number">03</span><span class="process-symbol">⌁</span><h3>Зафиксируйте момент</h3><p>Во время короткой концентрации EEG-гарнитура записывает характеристики состояния.</p></article><span class="process-line" aria-hidden="true"></span>
+        <article class="process-step"><span class="step-number">04</span><span class="process-symbol">0101</span><h3>Получите Universe ID</h3><p>Текст, EEG, время, цель и цифровой хеш объединяются в единый пакет.</p></article><span class="process-line" aria-hidden="true"></span>
         <article class="process-step"><span class="step-number">05</span><span class="process-symbol">↗</span><h3>Передайте сигнал</h3><p>После технического согласования пакет включается в направленный радиосеанс, а статус фиксируется в сертификате.</p></article>`;
 
       const audience = doc.querySelector('.audience-section');
       if (audience) {
         audience.id = 'scenarios';
         audience.querySelector('.section-heading').innerHTML = '<span class="section-kicker">Сценарии участия</span><h2>Один проект — три понятных способа участия</h2><p>Вы выбираете не другую технологию, а контекст, в котором хотите прожить этот опыт.</p>';
+        audience.querySelector('.section-heading').insertAdjacentHTML('afterend', art('../assets/test-scenarios.webp','Личное желание, подарок близкому и общий космический сигнал'));
         audience.querySelector('.audience-grid').innerHTML = `
           <article><span>♡</span><strong>Для себя</strong><p>Зафиксировать важную мысль, желание или начало нового этапа и получить собственный Universe ID.</p><button class="footer-link-button js-open-builder" type="button">Создать свой сигнал</button></article>
           <article><span>♢</span><strong>В подарок</strong><p>Создать персональное космическое послание для близкого человека с его страницей и сертификатом.</p><button class="footer-link-button js-open-builder" type="button" data-gift="true">Подготовить подарок</button></article>
@@ -70,12 +79,15 @@
         if (formats && formats.parentNode) formats.parentNode.insertBefore(audience, formats);
       }
 
+      const formatsHeading = doc.querySelector('#formats .section-heading');
+      if (formatsHeading) formatsHeading.insertAdjacentHTML('afterend', art('../assets/test-formats.webp','Форматы участия в проекте Желание сквозь Вселенную'));
+
       const technology = doc.querySelector('#technology');
       if (technology) {
         const mission = doc.createElement('section');
         mission.className = 'section section-dark';
         mission.id = 'mission';
-        mission.innerHTML = `<div class="container"><div class="section-heading reveal"><span class="section-kicker">После формирования пакета</span><h2>Куда направлен сигнал</h2><p>Здесь показывается именно технический маршрут передачи, а не повтор механики создания желания.</p></div><div class="mission-card reveal"><span class="section-kicker">Маршрут сигнала <span class="test-inline-label">TEST</span></span><div class="mission-route">Земля → передающая антенна → выбранная звезда</div><p>После подтверждённого сеанса этот блок будет показывать фактические дату и время, антенну, направление, параметры пакета и статус передачи.</p><div class="transmission-status"><span class="status-pulse"></span><span><strong>Следующее окно передачи:</strong> появится только после технического согласования</span></div></div></div>`;
+        mission.innerHTML = `<div class="container"><div class="section-heading reveal"><span class="section-kicker">После формирования пакета</span><h2>Куда направлен сигнал</h2><p>Здесь показывается именно технический маршрут передачи, а не повтор механики создания желания.</p></div>${art('../assets/test-mission.webp','Радиоантенна отправляет сигнал к выбранной звезде')}<div class="mission-card reveal"><span class="section-kicker">Маршрут сигнала <span class="test-inline-label">TEST</span></span><div class="mission-route">Земля → передающая антенна → выбранная звезда</div><p>После подтверждённого сеанса этот блок будет показывать фактические дату и время, антенну, направление, параметры пакета и статус передачи.</p><div class="transmission-status"><span class="status-pulse"></span><span><strong>Следующее окно передачи:</strong> появится только после технического согласования</span></div></div></div>`;
         technology.insertAdjacentElement('afterend', mission);
       }
 
@@ -87,9 +99,15 @@
         const registry = doc.createElement('section');
         registry.className = 'section section-dark';
         registry.id = 'registry';
-        registry.innerHTML = `<div class="container"><div class="section-heading reveal"><span class="section-kicker">После создания Universe ID</span><h2>Universe Registry</h2><p>Публичный реестр подтверждает существование сигнала, но не раскрывает личное содержание без согласия владельца.</p></div><div class="registry-card reveal"><div class="registry-row"><strong>UNV-DEMO-000184</strong><span>Москва → HD 20794</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000185</strong><span>Санкт-Петербург → TRAPPIST-1</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000186</strong><span>Казань → Polaris</span><span>DEMO</span></div></div></div>`;
+        registry.innerHTML = `<div class="container"><div class="section-heading reveal"><span class="section-kicker">После создания Universe ID</span><h2>Universe Registry</h2><p>Публичный реестр подтверждает существование сигнала, но не раскрывает личное содержание без согласия владельца.</p></div>${art('../assets/test-registry.webp','Космический архив и реестр уникальных сигналов')}<div class="registry-card reveal"><div class="registry-row"><strong>UNV-DEMO-000184</strong><span>Москва → HD 20794</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000185</strong><span>Санкт-Петербург → TRAPPIST-1</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000186</strong><span>Казань → Polaris</span><span>DEMO</span></div></div></div>`;
         certificate.insertAdjacentElement('afterend', registry);
       }
+
+      const faqHeading = doc.querySelector('#faq .section-heading');
+      if (faqHeading) faqHeading.insertAdjacentHTML('beforeend', art('../assets/test-faq.webp','Наблюдение за Вселенной и поиск ответов о проекте'));
+
+      const ctaCard = doc.querySelector('.cta-section .cta-card');
+      if (ctaCard) ctaCard.insertAdjacentHTML('beforeend', art('../assets/test-cta.webp','Личное послание начинает путь к звёздам'));
 
       const footerProject = doc.querySelector('.footer-links > div:first-child');
       if (footerProject) footerProject.innerHTML = '<strong>Проект</strong><a href="#how">Как работает</a><a href="#scenarios">Сценарии</a><a href="#formats">Форматы</a><a href="#technology">Технология</a>';
