@@ -1,6 +1,12 @@
 (() => {
   'use strict';
 
+  const favicon = document.querySelector('link[rel~="icon"]') || document.createElement('link');
+  favicon.rel = 'icon';
+  favicon.type = 'image/svg+xml';
+  favicon.href = window.location.pathname.includes('/test/') ? '../favicon-test.svg' : 'favicon.svg';
+  if (!favicon.parentNode) document.head.appendChild(favicon);
+
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
