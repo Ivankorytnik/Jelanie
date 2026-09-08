@@ -59,6 +59,13 @@
         .cta-section .cta-card > *{min-width:0}
         .cta-section .test-art{grid-column:auto;margin:0;width:100%;max-width:none;align-self:stretch}
         .cta-section .test-art img{aspect-ratio:16/10;height:100%}
+        .application-form .field select{width:100%;height:52px;border:1px solid rgba(148,163,184,.2);border-radius:12px;background:#101620;color:#f7f9ff;padding:0 14px;font:inherit;outline:none}
+        .application-form .field select:focus{border-color:rgba(104,231,255,.55);box-shadow:0 0 0 3px rgba(104,231,255,.07)}
+        .application-note{margin:2px 0 0;color:#8e9aae;font-size:12px;line-height:1.6}
+        .application-status{min-height:20px;margin-top:12px;color:#ffb6b6;font-size:12px}
+        .application-success{padding:26px;border:1px solid rgba(104,231,255,.18);border-radius:18px;background:rgba(9,16,28,.72)}
+        .application-success h3{margin:10px 0 8px;font-size:28px}
+        .application-success p{margin:0;color:#aab4c5;line-height:1.65}
         @media(max-width:820px){.audience-section .audience-grid{grid-template-columns:1fr}.registry-row{grid-template-columns:1fr}.test-art{border-radius:20px;margin:20px 0 28px}.test-side-layout,.test-side-layout.reverse,.cta-section .cta-card{grid-template-columns:1fr;gap:18px}.test-side-layout.reverse .section-heading,.test-side-layout.reverse .test-art{order:initial}.test-side-layout .section-heading{text-align:center;align-items:center}.test-side-layout .section-heading p{max-width:none}.cta-section .test-art img,#faq .test-art img{aspect-ratio:16/9;height:auto}}
       `;
       doc.head.appendChild(style);
@@ -85,9 +92,9 @@
         audience.querySelector('.section-heading').insertAdjacentHTML('afterend', `<div class="test-side-layout reveal"><div class="section-heading compact"><span class="section-kicker">Сценарии участия</span><h2>Один проект — три понятных способа участия</h2><p>Вы выбираете не другую технологию, а контекст, в котором хотите прожить этот опыт.</p></div>${art('../assets/test-scenarios.webp','Личное желание, подарок близкому и общий космический сигнал')}</div>`);
         audience.querySelector('.section-heading').remove();
         audience.querySelector('.audience-grid').innerHTML = `
-          <article><span>♡</span><strong>Для себя</strong><p>Зафиксировать важную мысль, желание или начало нового этапа и получить собственный Universe ID.</p><button class="footer-link-button js-open-builder" type="button">Создать свой сигнал</button></article>
-          <article><span>♢</span><strong>В подарок</strong><p>Создать персональное космическое послание для близкого человека с его страницей и сертификатом.</p><button class="footer-link-button js-open-builder" type="button" data-gift="true">Подготовить подарок</button></article>
-          <article><span>∞</span><strong>Для события / бренда</strong><p>Объединить несколько персональных сообщений в одну общую космическую миссию.</p><button class="footer-link-button js-open-builder" type="button">Собрать сигнал</button></article>`;
+          <article><span>♡</span><strong>Для себя</strong><p>Зафиксировать важную мысль, желание или начало нового этапа и получить собственный Universe ID.</p><button class="footer-link-button js-open-builder" type="button">Оставить заявку</button></article>
+          <article><span>♢</span><strong>В подарок</strong><p>Создать персональное космическое послание для близкого человека с его страницей и сертификатом.</p><button class="footer-link-button js-open-builder" type="button" data-gift="true">Заявка на подарок</button></article>
+          <article><span>∞</span><strong>Для события / бренда</strong><p>Объединить несколько персональных сообщений в одну общую космическую миссию.</p><button class="footer-link-button js-open-builder" type="button" data-application-format="event">Оставить заявку</button></article>`;
         const formats = doc.querySelector('#formats');
         if (formats && formats.parentNode) formats.parentNode.insertBefore(audience, formats);
       }
@@ -105,7 +112,7 @@
       }
 
       const certCopy = doc.querySelector('#certificate .certificate-copy');
-      if (certCopy) certCopy.innerHTML = `<span class="section-kicker">Главный цифровой артефакт</span><h2>Universe ID — космический паспорт желания</h2><p>Universe ID связывает весь путь в одну сущность: личное послание, EEG-отпечаток, выбранную цель, цифровой хеш и статус передачи. Сертификат — это визуальное подтверждение данных Universe ID.</p><ul class="check-list"><li>Уникальный ID сигнала</li><li>Текст и EEG-отпечаток момента</li><li>Координаты выбранной цели</li><li>SHA-256 для проверки целостности</li><li>Статус PREPARED → TRANSMITTED и фактические параметры сеанса</li></ul><button class="button button-outline js-open-builder" type="button">Создать Universe ID</button>`;
+      if (certCopy) certCopy.innerHTML = `<span class="section-kicker">Главный цифровой артефакт</span><h2>Universe ID — космический паспорт желания</h2><p>Universe ID связывает весь путь в одну сущность: личное послание, EEG-отпечаток, выбранную цель, цифровой хеш и статус передачи. Сертификат — это визуальное подтверждение данных Universe ID.</p><ul class="check-list"><li>Уникальный ID сигнала</li><li>Текст и EEG-отпечаток момента</li><li>Координаты выбранной цели</li><li>SHA-256 для проверки целостности</li><li>Статус PREPARED → TRANSMITTED и фактические параметры сеанса</li></ul><button class="button button-outline js-open-builder" type="button">Оставить заявку</button>`;
 
       const certificate = doc.querySelector('#certificate');
       if (certificate) {
@@ -116,9 +123,12 @@
         certificate.insertAdjacentElement('afterend', registry);
       }
 
-
       const ctaCard = doc.querySelector('.cta-section .cta-card');
-      if (ctaCard) ctaCard.insertAdjacentHTML('beforeend', art('../assets/test-cta.webp','Личное послание начинает путь к звёздам'));
+      if (ctaCard) {
+        const ctaCopy = ctaCard.querySelector('div:first-child');
+        if (ctaCopy) ctaCopy.innerHTML = '<span class="section-kicker">Первая передача формируется</span><h2>Оставьте заявку на участие в проекте</h2><p>Мы свяжемся с вами, расскажем о формате, сроках и следующих шагах. Само желание в заявке указывать не нужно.</p>';
+        ctaCard.insertAdjacentHTML('beforeend', art('../assets/test-cta.webp','Личное послание начинает путь к звёздам'));
+      }
 
       const applySideLayout = (selector, reverse = false) => {
         const section = doc.querySelector(selector);
@@ -139,10 +149,103 @@
       const footerProject = doc.querySelector('.footer-links > div:first-child');
       if (footerProject) footerProject.innerHTML = '<strong>Проект</strong><a href="#how">Как работает</a><a href="#scenarios">Сценарии</a><a href="#formats">Форматы</a><a href="#technology">Технология</a>';
 
+      doc.querySelectorAll('.js-package').forEach((button) => {
+        button.classList.remove('js-package');
+        button.classList.add('js-open-builder');
+      });
+
+      doc.querySelectorAll('.js-open-builder').forEach((button) => {
+        if (button.dataset.gift === 'true') button.textContent = 'Заявка на подарок';
+        else button.textContent = 'Оставить заявку';
+      });
+
+      const modal = doc.querySelector('#signal-modal');
+      if (modal) {
+        modal.innerHTML = `
+          <div class="modal-backdrop" data-close-modal></div>
+          <section class="builder" role="dialog" aria-modal="true" aria-labelledby="builder-title">
+            <button class="modal-close" type="button" aria-label="Закрыть" data-close-modal>×</button>
+            <div class="builder-header">
+              <div><span class="section-kicker">Заявка на участие</span><h2 id="builder-title">Оставьте заявку</h2></div>
+            </div>
+            <form id="signal-form" class="application-form" novalidate>
+              <div class="builder-step active" data-step="1">
+                <div class="step-heading"><h3>Контактные данные</h3><p>Оставьте контакты — мы свяжемся с вами и уточним детали участия. Само желание здесь писать не нужно.</p></div>
+                <div class="form-grid">
+                  <label class="field"><span>Имя</span><input id="participant-name" name="name" type="text" maxlength="60" placeholder="Например, Иван" required></label>
+                  <label class="field"><span>Email</span><input id="participant-email" name="email" type="email" maxlength="100" placeholder="name@example.com" required></label>
+                  <label class="field"><span>Телефон или Telegram</span><input id="participant-contact" name="contact" type="text" maxlength="100" placeholder="+7 ... или @username"></label>
+                  <label class="field"><span>Формат участия</span><select id="application-format" name="format"><option value="personal">Для себя</option><option value="gift">В подарок</option><option value="event">Событие / бренд</option><option value="unknown">Пока не определился</option></select></label>
+                  <label class="field field-full"><span>Комментарий</span><textarea id="application-comment" name="comment" maxlength="500" rows="5" placeholder="Например: хочу узнать о сроках, формате участия и стоимости."></textarea></label>
+                </div>
+                <p class="application-note">После заявки команда проекта свяжется с вами и отдельно согласует содержание будущего послания, EEG-сеанс и технические параметры передачи.</p>
+                <div class="application-status" id="application-status" aria-live="polite"></div>
+                <div class="builder-actions"><span></span><button class="button button-gradient" type="submit">Сформировать заявку</button></div>
+              </div>
+            </form>
+          </section>`;
+      }
+
       const badge = doc.createElement('div');
       badge.className = 'test-stand-badge';
-      badge.textContent = 'TEST / единая логика';
+      badge.textContent = 'TEST / заявка';
       doc.body.appendChild(badge);
+
+      const requestScript = doc.createElement('script');
+      requestScript.textContent = `
+        (() => {
+          const form = document.querySelector('#signal-form');
+          const format = document.querySelector('#application-format');
+          const status = document.querySelector('#application-status');
+
+          document.querySelectorAll('.js-open-builder').forEach((button) => {
+            button.addEventListener('click', () => {
+              setTimeout(() => {
+                if (!format) return;
+                if (button.dataset.gift === 'true') format.value = 'gift';
+                else if (button.dataset.applicationFormat === 'event') format.value = 'event';
+              }, 0);
+            });
+          });
+
+          form?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const name = document.querySelector('#participant-name')?.value.trim() || '';
+            const email = document.querySelector('#participant-email')?.value.trim() || '';
+            const contact = document.querySelector('#participant-contact')?.value.trim() || '';
+            const comment = document.querySelector('#application-comment')?.value.trim() || '';
+            const selectedFormat = format?.value || 'unknown';
+            const emailOk = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+
+            if (!name || !emailOk) {
+              if (status) status.textContent = !name ? 'Укажите имя.' : 'Проверьте адрес электронной почты.';
+              return;
+            }
+
+            const now = new Date();
+            const application = {
+              id: 'REQ-' + now.toISOString().slice(0,10).replaceAll('-', '') + '-' + Math.random().toString(36).slice(2,8).toUpperCase(),
+              createdAt: now.toISOString(),
+              name,
+              email,
+              contact,
+              format: selectedFormat,
+              comment,
+              source: 'spacewish.agency/test/'
+            };
+
+            try {
+              const saved = JSON.parse(localStorage.getItem('spacewishTestApplications') || '[]');
+              saved.unshift(application);
+              localStorage.setItem('spacewishTestApplications', JSON.stringify(saved.slice(0, 50)));
+            } catch (error) {
+              console.warn('Не удалось сохранить тестовую заявку локально', error);
+            }
+
+            form.innerHTML = '<div class="application-success"><span class="section-kicker">Заявка сформирована</span><h3>Спасибо, ' + name.replace(/[<>]/g, '') + '</h3><p>Контактные данные сохранены в тестовом режиме. Следующий этап — подключить отправку заявок в CRM или на корпоративную почту.</p></div>';
+          });
+        })();`;
+      doc.body.appendChild(requestScript);
 
       document.open();
       document.write('<!doctype html>' + doc.documentElement.outerHTML);
