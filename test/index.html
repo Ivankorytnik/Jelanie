@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#05070c">
   <title>Желание сквозь Вселенную — TEST</title>
+  <link rel="icon" href="../favicon-test.svg" type="image/svg+xml">
 </head>
 <body>
   <div style="min-height:100vh;background:#05070c;color:#fff;display:grid;place-items:center;font:16px system-ui">Загрузка тестового стенда…</div>
@@ -24,76 +26,21 @@
 </style>`;
 
       const additions = `
-<section class="section section-dark test-new" id="test-scenarios">
-  <div class="container">
-    <div class="section-heading reveal"><span class="section-kicker">Новые продуктовые механики · TEST</span><h2>Три сценария одного проекта</h2><p>Весь основной проект остаётся прежним. Ниже — дополнительные способы войти в него.</p></div>
-    <div class="test-scenarios reveal">
-      <article class="test-card"><span class="test-mini">Для себя</span><h3>Отправить своё желание</h3><p>Личное послание, EEG-отпечаток момента, выбранная звезда и собственный Universe ID.</p><button class="button button-ghost js-open-builder" type="button">Создать сигнал</button></article>
-      <article class="test-card"><span class="test-mini">В подарок</span><h3>Подарить космический сигнал</h3><p>Персональная страница получателя, повод, послание, выбранная цель и статус передачи.</p><a class="button button-ghost" href="#test-gift">Посмотреть механику</a></article>
-      <article class="test-card"><span class="test-mini">Для события / бренда</span><h3>Общий сигнал события</h3><p>Свадьба, юбилей, фестиваль или бренд-проект: несколько персональных сообщений объединяются в одну миссию.</p><a class="button button-ghost" href="#test-mission">Посмотреть миссию</a></article>
-    </div>
-  </div>
-</section>
-
-<section class="section test-new" id="test-ritual">
-  <div class="container">
-    <div class="section-heading reveal"><span class="section-kicker">Ритуал фиксации момента · TEST</span><h2>EEG становится частью события</h2><p>Не отдельная техническая процедура, а понятная последовательность действий.</p></div>
-    <div class="test-ritual reveal">
-      <article class="test-card"><span class="test-mini">01</span><h3>Сформулируйте</h3><p>Запишите желание или послание своими словами.</p></article>
-      <article class="test-card"><span class="test-mini">02</span><h3>Выберите звезду</h3><p>Определите направление, расстояние и смысл цели.</p></article>
-      <article class="test-card"><span class="test-mini">03</span><h3>Наденьте EEG</h3><p>Гарнитура готовится к фиксации характеристик момента.</p></article>
-      <article class="test-card"><span class="test-mini">04</span><h3>Сконцентрируйтесь</h3><p>20 секунд внимания только на выбранной мысли.</p></article>
-      <article class="test-card"><span class="test-mini">05</span><h3>Получите ID</h3><p>Текст, время, EEG и цель объединяются в цифровой артефакт.</p></article>
-    </div>
-  </div>
-</section>
-
-<section class="section section-dark test-new" id="test-universe-id">
-  <div class="container">
-    <div class="section-heading reveal"><span class="section-kicker">Главный артефакт · TEST</span><h2>Universe ID — космический паспорт желания</h2><p>Он связывает личный момент, данные и подтверждаемое техническое действие.</p></div>
-    <div class="test-id reveal">
-      <div><span class="test-mini">UNIVERSE ID</span><div class="test-id-code">UNV-2026-000184</div><h3>«То, что важно именно сейчас»</h3><p>Имя или псевдоним · дата и время · EEG-отпечаток · выбранная звезда · координаты · цифровой хеш.</p><div class="test-statuses"><span class="test-status">PREPARED</span><span class="test-status">SCHEDULED</span><span class="test-status">TRANSMITTED</span></div></div>
-      <article class="test-card"><span class="test-mini">Цель</span><h3>HD 20794</h3><p>В карточке сохраняются координаты цели, параметры пакета и подтверждение фактического сеанса.</p><p><strong>Приватность:</strong> публикация в реестре — только по согласию владельца.</p></article>
-    </div>
-  </div>
-</section>
-
-<section class="section test-new" id="test-mission">
-  <div class="container">
-    <div class="section-heading reveal"><span class="section-kicker">Ощущение реальной миссии · TEST</span><h2>Куда направлен сигнал</h2></div>
-    <article class="test-card reveal"><span class="test-mini">Маршрут</span><div class="test-route">Земля → радиотелескоп → HD 20794</div><p>После подтверждённого сеанса здесь могут отображаться фактические дата и время передачи, направление, параметры пакета и статус миссии.</p><div class="transmission-status"><span class="status-pulse"></span><span><strong>Следующее окно передачи:</strong> формируется после технического согласования</span></div></article>
-  </div>
-</section>
-
-<section class="section section-dark test-new" id="test-gift">
-  <div class="container">
-    <div class="section-heading reveal"><span class="section-kicker">Подарочный сценарий · TEST</span><h2>Подарить желание</h2></div>
-    <div class="test-gift reveal"><span class="test-mini">Персональная страница получателя</span><h3>«Мария, для тебя создан сигнал во Вселенную»</h3><p>Даритель выбирает повод, пишет послание и направление. Получатель видит персональную страницу, Universe ID, цель и статус будущей передачи.</p><div class="hero-actions"><button class="button button-gradient js-open-builder" type="button">Создать подарок</button><a class="button button-ghost" href="#test-universe-id">Посмотреть Universe ID</a></div></div>
-  </div>
-</section>
-
-<section class="section test-new" id="test-registry">
-  <div class="container">
-    <div class="section-heading reveal"><span class="section-kicker">Публичный реестр · TEST</span><h2>Universe Registry</h2><p>Показывает факт существования сигнала. Имя и текст желания раскрываются только по выбору владельца.</p></div>
-    <div class="test-card reveal">
-      <div class="test-registry-row"><strong>UNV-2026-000184</strong><span>Москва → HD 20794</span><span>PREPARED</span></div>
-      <div class="test-registry-row"><strong>UNV-2026-000185</strong><span>Санкт-Петербург → TRAPPIST-1</span><span>PREPARED</span></div>
-      <div class="test-registry-row"><strong>UNV-2026-000186</strong><span>Казань → Polaris</span><span>SCHEDULED</span></div>
-    </div>
-  </div>
-</section>
-
-<section class="section section-dark test-new" id="test-principle">
-  <div class="container"><div class="section-heading reveal"><span class="section-kicker">Принцип проекта · TEST</span><h2>Не обещаем исполнение желания</h2><p>Мы фиксируем момент, создаём цифровой пакет, присваиваем Universe ID и после технического согласования включаем его в направленную радиопередачу.</p></div></div>
-</section>`;
+<section class="section section-dark test-new" id="test-scenarios"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Новые продуктовые механики · TEST</span><h2>Три сценария одного проекта</h2><p>Весь основной проект остаётся прежним. Ниже — дополнительные способы войти в него.</p></div><div class="test-scenarios reveal"><article class="test-card"><span class="test-mini">Для себя</span><h3>Отправить своё желание</h3><p>Личное послание, EEG-отпечаток момента, выбранная звезда и собственный Universe ID.</p><button class="button button-ghost js-open-builder" type="button">Создать сигнал</button></article><article class="test-card"><span class="test-mini">В подарок</span><h3>Подарить космический сигнал</h3><p>Персональная страница получателя, повод, послание, выбранная цель и статус передачи.</p><a class="button button-ghost" href="#test-gift">Посмотреть механику</a></article><article class="test-card"><span class="test-mini">Для события / бренда</span><h3>Общий сигнал события</h3><p>Свадьба, юбилей, фестиваль или бренд-проект: несколько персональных сообщений объединяются в одну миссию.</p><a class="button button-ghost" href="#test-mission">Посмотреть миссию</a></article></div></div></section>
+<section class="section test-new" id="test-ritual"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Ритуал фиксации момента · TEST</span><h2>EEG становится частью события</h2><p>Не отдельная техническая процедура, а понятная последовательность действий.</p></div><div class="test-ritual reveal"><article class="test-card"><span class="test-mini">01</span><h3>Сформулируйте</h3><p>Запишите желание или послание своими словами.</p></article><article class="test-card"><span class="test-mini">02</span><h3>Выберите звезду</h3><p>Определите направление, расстояние и смысл цели.</p></article><article class="test-card"><span class="test-mini">03</span><h3>Наденьте EEG</h3><p>Гарнитура готовится к фиксации характеристик момента.</p></article><article class="test-card"><span class="test-mini">04</span><h3>Сконцентрируйтесь</h3><p>20 секунд внимания только на выбранной мысли.</p></article><article class="test-card"><span class="test-mini">05</span><h3>Получите ID</h3><p>Текст, время, EEG и цель объединяются в цифровой артефакт.</p></article></div></div></section>
+<section class="section section-dark test-new" id="test-universe-id"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Главный артефакт · TEST</span><h2>Universe ID — космический паспорт желания</h2><p>Он связывает личный момент, данные и подтверждаемое техническое действие.</p></div><div class="test-id reveal"><div><span class="test-mini">UNIVERSE ID</span><div class="test-id-code">UNV-2026-000184</div><h3>«То, что важно именно сейчас»</h3><p>Имя или псевдоним · дата и время · EEG-отпечаток · выбранная звезда · координаты · цифровой хеш.</p><div class="test-statuses"><span class="test-status">PREPARED</span><span class="test-status">SCHEDULED</span><span class="test-status">TRANSMITTED</span></div></div><article class="test-card"><span class="test-mini">Цель</span><h3>HD 20794</h3><p>В карточке сохраняются координаты цели, параметры пакета и подтверждение фактического сеанса.</p><p><strong>Приватность:</strong> публикация в реестре — только по согласию владельца.</p></article></div></div></section>
+<section class="section test-new" id="test-mission"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Ощущение реальной миссии · TEST</span><h2>Куда направлен сигнал</h2></div><article class="test-card reveal"><span class="test-mini">Маршрут</span><div class="test-route">Земля → радиотелескоп → HD 20794</div><p>После подтверждённого сеанса здесь могут отображаться фактические дата и время передачи, направление, параметры пакета и статус миссии.</p><div class="transmission-status"><span class="status-pulse"></span><span><strong>Следующее окно передачи:</strong> формируется после технического согласования</span></div></article></div></section>
+<section class="section section-dark test-new" id="test-gift"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Подарочный сценарий · TEST</span><h2>Подарить желание</h2></div><div class="test-gift reveal"><span class="test-mini">Персональная страница получателя</span><h3>«Мария, для тебя создан сигнал во Вселенную»</h3><p>Даритель выбирает повод, пишет послание и направление. Получатель видит персональную страницу, Universe ID, цель и статус будущей передачи.</p><div class="hero-actions"><button class="button button-gradient js-open-builder" type="button" data-gift="true">Создать подарок</button><a class="button button-ghost" href="#test-universe-id">Посмотреть Universe ID</a></div></div></div></section>
+<section class="section test-new" id="test-registry"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Публичный реестр · TEST</span><h2>Universe Registry</h2><p>Показывает факт существования сигнала. Имя и текст желания раскрываются только по выбору владельца.</p></div><div class="test-card reveal"><div class="test-registry-row"><strong>UNV-2026-000184</strong><span>Москва → HD 20794</span><span>PREPARED</span></div><div class="test-registry-row"><strong>UNV-2026-000185</strong><span>Санкт-Петербург → TRAPPIST-1</span><span>PREPARED</span></div><div class="test-registry-row"><strong>UNV-2026-000186</strong><span>Казань → Polaris</span><span>SCHEDULED</span></div></div></div></section>
+<section class="section section-dark test-new" id="test-principle"><div class="container"><div class="section-heading reveal"><span class="section-kicker">Принцип проекта · TEST</span><h2>Не обещаем исполнение желания</h2><p>Мы фиксируем момент, создаём цифровой пакет, присваиваем Universe ID и после технического согласования включаем его в направленную радиопередачу.</p></div></div></section>`;
 
       html = html.replace('<link rel="stylesheet" href="style.css">','<link rel="stylesheet" href="../style.css">');
-      html = html.replace('<script src="script.js"></script>','<script src="../script.js"></script>');
+      html = html.replace('<title>Желание сквозь Вселенную</title>', '<title>Желание сквозь Вселенную — TEST</title><link rel="icon" href="../favicon-test.svg" type="image/svg+xml">');
       html = html.replace('</head>', testCss + '\n</head>');
       html = html.replace('</main>', additions + '\n</main>');
       html = html.replace('</body>', '<div class="test-stand-badge">TEST / production + механики</div>\n</body>');
       html = html.replace('<a href="#faq">FAQ</a>', '<a href="#faq">FAQ</a><a href="#test-scenarios">TEST-механики</a>');
-      html = html.replace('<title>Желание сквозь Вселенную</title>', '<title>Желание сквозь Вселенную — TEST</title>');
+      html = html.replace('<scr' + 'ipt src="script.js"></scr' + 'ipt>', '<scr' + 'ipt src="../script.js"></scr' + 'ipt>');
 
       document.open();
       document.write(html);
