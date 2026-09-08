@@ -1,0 +1,46 @@
+name: Export site images
+
+on:
+  push:
+    paths:
+      - '.github/workflows/export-site-images.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build image archive
+        run: |
+          mkdir -p exports/site-images
+          cp assets/certificate.webp exports/site-images/
+          cp assets/eeg-wish.webp exports/site-images/
+          cp assets/rt64.webp exports/site-images/
+          cp assets/signal-path.webp exports/site-images/
+          cp assets/test-cta.webp exports/site-images/
+          cp assets/test-formats.webp exports/site-images/
+          cp assets/test-mission.webp exports/site-images/
+          cp assets/test-registry.webp exports/site-images/
+          cp assets/test-scenarios.webp exports/site-images/
+          cat > exports/site-images/README.txt <<'EOF'
+          SpaceWish / Jelanie — изображения, используемые на сайте и тестовой странице.
+          FAQ-изображение не включено, так как оно удалено из текущей версии.
+          EOF
+          cd exports
+          zip -r spacewish-site-images.zip site-images
+          cd ..
+
+      - name: Commit archive
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add exports/spacewish-site-images.zip
+          git commit -m 'Export current site images' || exit 0
+          git push
