@@ -30,6 +30,11 @@
 
       const style = doc.createElement('style');
       style.textContent = `
+
+        /* Critical anti-flash rules: production contains inline SVG illustrations
+           that must stay hidden before the external stylesheet finishes loading. */
+        .hero-visual .dish-illustration,.tech-visual svg{display:none!important}
+        .brand-mark svg{display:block;width:52px;height:52px;max-width:100%}
         .test-stand-badge{position:fixed;right:16px;bottom:16px;z-index:120;padding:8px 12px;border:1px solid rgba(104,231,255,.3);border-radius:999px;background:rgba(7,11,18,.92);backdrop-filter:blur(16px);color:#bfefff;font-size:9px;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 12px 40px rgba(0,0,0,.28)}
         .test-inline-label{display:inline-flex;margin-left:8px;padding:3px 6px;border:1px solid rgba(104,231,255,.22);border-radius:999px;color:#9eefff;font-size:8px;letter-spacing:.12em;vertical-align:middle}
         .audience-section .audience-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -111,8 +116,6 @@
         certificate.insertAdjacentElement('afterend', registry);
       }
 
-      const faqHeading = doc.querySelector('#faq .section-heading');
-      if (faqHeading) faqHeading.insertAdjacentHTML('afterend', art('../assets/test-faq.webp','Наблюдение за Вселенной и поиск ответов о проекте'));
 
       const ctaCard = doc.querySelector('.cta-section .cta-card');
       if (ctaCard) ctaCard.insertAdjacentHTML('beforeend', art('../assets/test-cta.webp','Личное послание начинает путь к звёздам'));
@@ -132,7 +135,6 @@
       };
 
       applySideLayout('#formats', true);
-      applySideLayout('#faq', false);
 
       const footerProject = doc.querySelector('.footer-links > div:first-child');
       if (footerProject) footerProject.innerHTML = '<strong>Проект</strong><a href="#how">Как работает</a><a href="#scenarios">Сценарии</a><a href="#formats">Форматы</a><a href="#technology">Технология</a>';
