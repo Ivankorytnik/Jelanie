@@ -106,17 +106,18 @@
   const heroStatus = document.querySelector('.hero-copy .transmission-status > span:last-child');
   if (heroStatus && heroStatus.textContent.includes('РТ-64')) heroStatus.remove();
 
+  const certificateDownloadUrl = 'https://drive.google.com/uc?export=download&id=1xc0oDftRXW5I8ppTPt1HP3PZ8U5hwklv';
   document.querySelectorAll('a').forEach((link) => {
     if (link.textContent.trim() === 'Пример сертификата') {
-      link.href = 'assets/certificate-example.png';
-      link.setAttribute('download', 'spacewish-certificate-example.png');
+      link.href = certificateDownloadUrl;
+      link.removeAttribute('download');
       link.removeAttribute('target');
       link.removeAttribute('rel');
     }
   });
 
   const certCopy = document.querySelector('#certificate .certificate-copy');
-  if (certCopy) certCopy.innerHTML = `<span class="section-kicker">Главный цифровой артефакт</span><h2>Universe ID — космический паспорт желания</h2><p>Universe ID связывает весь путь в одну сущность: личное послание, EEG-отпечаток, выбранную цель, цифровой хеш и статус передачи. Сертификат — это визуальное подтверждение данных Universe ID.</p><ul class="check-list"><li>Уникальный ID сигнала</li><li>Текст и EEG-отпечаток момента</li><li>Координаты выбранной цели</li><li>SHA-256 для проверки целостности</li><li>Статус PREPARED → TRANSMITTED и фактические параметры сеанса</li></ul><div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:26px;"><a class="button button-ghost" href="assets/certificate-example.png" download="spacewish-certificate-example.png">Пример сертификата</a><button class="button button-outline js-open-builder" type="button">Оставить заявку</button></div>`;
+  if (certCopy) certCopy.innerHTML = `<span class="section-kicker">Главный цифровой артефакт</span><h2>Universe ID — космический паспорт желания</h2><p>Universe ID связывает весь путь в одну сущность: личное послание, EEG-отпечаток, выбранную цель, цифровой хеш и статус передачи. Сертификат — это визуальное подтверждение данных Universe ID.</p><ul class="check-list"><li>Уникальный ID сигнала</li><li>Текст и EEG-отпечаток момента</li><li>Координаты выбранной цели</li><li>SHA-256 для проверки целостности</li><li>Статус PREPARED → TRANSMITTED и фактические параметры сеанса</li></ul><div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:26px;"><a class="button button-ghost" href="${certificateDownloadUrl}">Пример сертификата</a><button class="button button-outline js-open-builder" type="button">Оставить заявку</button></div>`;
 
   const certificate = document.querySelector('#certificate');
   if (certificate) {
