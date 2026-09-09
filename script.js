@@ -1,79 +1,234 @@
 (() => {
-  const path = window.location.pathname;
-  const isProductionRoot = path === '/' || path === '/index.html' || path === '/Jelanie/' || path === '/Jelanie/index.html';
+  'use strict';
 
-  const loadOriginalScript = () => {
+  const isTest = window.location.pathname.includes('/test/');
+  const loadBaseScript = () => {
     const script = document.createElement('script');
-    const base = path.startsWith('/Jelanie/') ? '/Jelanie/' : '/';
-    script.src = base + 'script-base.js?v=20260909';
-    document.head.appendChild(script);
+    script.src = (isTest ? '../' : '') + 'script-base.js?v=20260909c';
+    document.body.appendChild(script);
   };
 
-  if (!isProductionRoot) {
-    loadOriginalScript();
+  if (isTest) {
+    loadBaseScript();
     return;
   }
 
-  const renderProductionRelease = () => {
-    const base = path.startsWith('/Jelanie/') ? '/Jelanie/' : '/';
+  document.title = 'Желание сквозь Вселенную';
 
-    document.title = 'Желание сквозь Вселенную';
-    document.documentElement.style.margin = '0';
-    document.documentElement.style.padding = '0';
-    document.documentElement.style.background = '#05070c';
-    document.documentElement.style.height = '100%';
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    document.body.style.background = '#05070c';
-    document.body.style.height = '100%';
-    document.body.style.overflow = 'hidden';
-    document.body.innerHTML = '';
+  const style = document.createElement('style');
+  style.textContent = `
+    .hero-visual .dish-illustration,.tech-visual svg{display:none!important}
+    .hero-visual::after{content:"КОНЦЕПЦИЯ ПЕРЕДАЧИ"!important}
+    .brand-mark svg{display:block;width:52px;height:52px;max-width:100%}
+    .audience-section .audience-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .mission-card,.registry-card{padding:28px;border:1px solid rgba(148,163,184,.16);border-radius:22px;background:rgba(12,17,28,.66)}
+    .mission-route{font-size:clamp(26px,4vw,50px);line-height:1.08;margin:14px 0 20px}
+    .registry-row{display:grid;grid-template-columns:1fr 1.3fr .7fr;gap:14px;padding:14px 0;border-bottom:1px solid rgba(148,163,184,.12)}
+    .registry-row:last-child{border-bottom:0}
+    .test-art{position:relative;margin:26px auto 34px;overflow:hidden;width:min(680px,100%);border-radius:26px;border:1px solid rgba(104,231,255,.14);background:#07101c;box-shadow:0 30px 80px rgba(0,0,0,.38),0 0 55px rgba(86,133,255,.07)}
+    .test-art img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;transform:scale(1.002)}
+    .test-art:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 60%,rgba(5,7,12,.28)),linear-gradient(90deg,rgba(5,7,12,.12),transparent 28%,transparent 72%,rgba(5,7,12,.08))}
+    .test-side-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:32px;align-items:center;margin:10px 0 28px}
+    .test-side-layout.reverse{grid-template-columns:minmax(320px,.95fr) minmax(0,1.05fr)}
+    .test-side-layout .section-heading{margin:0;max-width:none;text-align:left;align-items:flex-start}
+    .test-side-layout .section-heading.compact{align-self:center}
+    .test-side-layout .section-heading p{max-width:640px}
+    .test-side-layout .test-art{margin:0;width:100%;max-width:none}
+    .test-side-layout.reverse .section-heading{order:2}
+    .test-side-layout.reverse .test-art{order:1}
+    #scenarios .audience-grid,#mission .mission-card,#registry .registry-card,#faq .faq-grid{margin-top:26px}
+    #faq .test-art img{aspect-ratio:4/3}
+    .cta-section .cta-card{overflow:hidden;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:32px;align-items:center}
+    .cta-section .cta-card > *{min-width:0}
+    .cta-section .test-art{grid-column:auto;margin:0;width:100%;max-width:none;align-self:stretch}
+    .cta-section .test-art img{aspect-ratio:16/10;height:100%}
+    .application-form .field select{width:100%;height:52px;border:1px solid rgba(148,163,184,.2);border-radius:12px;background:#101620;color:#f7f9ff;padding:0 14px;font:inherit;outline:none}
+    .application-form .field select:focus{border-color:rgba(104,231,255,.55);box-shadow:0 0 0 3px rgba(104,231,255,.07)}
+    .application-note{margin:2px 0 0;color:#8e9aae;font-size:12px;line-height:1.6}
+    .application-status{min-height:20px;margin-top:12px;color:#ffb6b6;font-size:12px}
+    .application-success{padding:26px;border:1px solid rgba(104,231,255,.18);border-radius:18px;background:rgba(9,16,28,.72)}
+    .application-success h3{margin:10px 0 8px;font-size:28px}
+    .application-success p{margin:0;color:#aab4c5;line-height:1.65}
+    @media(max-width:820px){.audience-section .audience-grid{grid-template-columns:1fr}.registry-row{grid-template-columns:1fr}.test-art{border-radius:20px;margin:20px 0 28px}.test-side-layout,.test-side-layout.reverse,.cta-section .cta-card{grid-template-columns:1fr;gap:18px}.test-side-layout.reverse .section-heading,.test-side-layout.reverse .test-art{order:initial}.test-side-layout .section-heading{text-align:center;align-items:center}.test-side-layout .section-heading p{max-width:none}.cta-section .test-art img,#faq .test-art img{aspect-ratio:16/9;height:auto}}
+  `;
+  document.head.appendChild(style);
 
-    const loading = document.createElement('div');
-    loading.textContent = 'Загрузка…';
-    loading.style.cssText = 'position:fixed;inset:0;display:grid;place-items:center;background:#05070c;color:#fff;font:16px system-ui;z-index:1';
+  const art = (src, alt, extra='') => `<figure class="test-art reveal ${extra}"><img src="${src}" alt="${alt}" loading="lazy" decoding="async"></figure>`;
 
-    const frame = document.createElement('iframe');
-    frame.src = base + 'release-20260909/';
-    frame.title = 'Желание сквозь Вселенную';
-    frame.setAttribute('aria-label', 'Желание сквозь Вселенную');
-    frame.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:0;background:#05070c;opacity:0;transition:opacity .15s ease;z-index:2';
+  const nav = document.querySelector('.main-nav');
+  if (nav) nav.innerHTML = '<a href="#how">Как это работает</a><a href="#scenarios">Сценарии</a><a href="#formats">Форматы</a><a href="#technology">Передатчик</a><a href="#certificate">Universe ID</a><a href="#faq">FAQ</a>';
 
-    frame.addEventListener('load', () => {
-      try {
-        const doc = frame.contentDocument;
-        if (doc) {
-          doc.title = 'Желание сквозь Вселенную';
-          doc.querySelector('.test-stand-badge')?.remove();
-          doc.querySelectorAll('.test-inline-label').forEach((node) => node.remove());
-          doc.querySelectorAll('link[rel~="icon"]').forEach((node) => {
-            node.setAttribute('href', base + 'favicon.svg');
-          });
+  const howHeading = document.querySelector('#how .section-heading');
+  if (howHeading) howHeading.innerHTML = '<span class="section-kicker">Один последовательный путь</span><h2>Как желание становится космическим сигналом</h2><p>От личной мысли до Universe ID и подготовленного радиосеанса — без лишних повторов и параллельных сценариев.</p>';
 
-          const cleanProductionText = () => {
-            doc.querySelectorAll('.application-success p').forEach((node) => {
-              if (node.textContent && node.textContent.includes('тестовом режиме')) {
-                node.textContent = 'Контактные данные сохранены в этом браузере. Отправка в CRM или на корпоративную почту пока не подключена.';
-              }
-            });
-          };
-          cleanProductionText();
-          new MutationObserver(cleanProductionText).observe(doc.body, {subtree:true, childList:true});
-        }
-      } catch (error) {
-        console.warn('Не удалось применить production-оформление release-снимка', error);
-      }
-      loading.remove();
-      frame.style.opacity = '1';
-    });
+  const process = document.querySelector('#how .process');
+  if (process) process.innerHTML = `
+    <article class="process-step"><span class="step-number">01</span><span class="process-symbol">✎</span><h3>Сформулируйте</h3><p>Запишите желание, мысль или личное послание своими словами.</p></article><span class="process-line" aria-hidden="true"></span>
+    <article class="process-step"><span class="step-number">02</span><span class="process-symbol">✦</span><h3>Выберите цель</h3><p>Определите звезду — направление, расстояние и смысл будущей передачи.</p></article><span class="process-line" aria-hidden="true"></span>
+    <article class="process-step"><span class="step-number">03</span><span class="process-symbol">⌁</span><h3>Зафиксируйте момент</h3><p>Во время короткой концентрации EEG-гарнитура записывает характеристики состояния.</p></article><span class="process-line" aria-hidden="true"></span>
+    <article class="process-step"><span class="step-number">04</span><span class="process-symbol">0101</span><h3>Получите Universe ID</h3><p>Текст, EEG, время, цель и цифровой хеш объединяются в единый пакет.</p></article><span class="process-line" aria-hidden="true"></span>
+    <article class="process-step"><span class="step-number">05</span><span class="process-symbol">↗</span><h3>Передайте сигнал</h3><p>После технического согласования пакет включается в направленный радиосеанс, а статус фиксируется в сертификате.</p></article>`;
 
-    document.body.appendChild(loading);
-    document.body.appendChild(frame);
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderProductionRelease, {once:true});
-  } else {
-    renderProductionRelease();
+  const audience = document.querySelector('.audience-section');
+  if (audience) {
+    audience.id = 'scenarios';
+    const originalHeading = audience.querySelector('.section-heading');
+    if (originalHeading) {
+      originalHeading.insertAdjacentHTML('afterend', `<div class="test-side-layout reveal"><div class="section-heading compact"><span class="section-kicker">Сценарии участия</span><h2>Один проект — три понятных способа участия</h2><p>Вы выбираете не другую технологию, а контекст, в котором хотите прожить этот опыт.</p></div>${art('assets/test-scenarios.webp','Личное желание, подарок близкому и общий космический сигнал')}</div>`);
+      originalHeading.remove();
+    }
+    const grid = audience.querySelector('.audience-grid');
+    if (grid) grid.innerHTML = `
+      <article><span>♡</span><strong>Для себя</strong><p>Зафиксировать важную мысль, желание или начало нового этапа и получить собственный Universe ID.</p><button class="footer-link-button js-open-builder" type="button">Оставить заявку</button></article>
+      <article><span>♢</span><strong>В подарок</strong><p>Создать персональное космическое послание для близкого человека с его страницей и сертификатом.</p><button class="footer-link-button js-open-builder" type="button" data-gift="true">Заявка на подарок</button></article>
+      <article><span>∞</span><strong>Для события / бренда</strong><p>Объединить несколько персональных сообщений в одну общую космическую миссию.</p><button class="footer-link-button js-open-builder" type="button" data-application-format="event">Оставить заявку</button></article>`;
+    const formats = document.querySelector('#formats');
+    if (formats && formats.parentNode) formats.parentNode.insertBefore(audience, formats);
   }
+
+  const formatsHeading = document.querySelector('#formats .section-heading');
+  if (formatsHeading) formatsHeading.insertAdjacentHTML('afterend', art('assets/test-formats.webp','Форматы участия в проекте Желание сквозь Вселенную'));
+
+  const technology = document.querySelector('#technology');
+  if (technology) {
+    const techCopy = technology.querySelector('.technology-copy > p');
+    if (techCopy) techCopy.textContent = 'Для первой передачи рассматривается инфраструктура дальней космической связи. Конкретная площадка, дата, частота и режим передачи появятся на сайте только после письменного подтверждения технического оператора.';
+    const techMetric = technology.querySelector('.tech-metrics > div:first-child strong');
+    if (techMetric) techMetric.textContent = 'ДАЛЬНЯЯ СВЯЗЬ';
+
+    const mission = document.createElement('section');
+    mission.className = 'section section-dark';
+    mission.id = 'mission';
+    mission.innerHTML = `<div class="container"><div class="test-side-layout reveal"><div class="section-heading"><span class="section-kicker">После формирования пакета</span><h2>Куда направлен сигнал</h2><p>Здесь показывается именно технический маршрут передачи, а не повтор механики создания желания.</p></div>${art('assets/test-mission.webp','Радиоантенна отправляет сигнал к выбранной звезде')}</div><div class="mission-card reveal"><span class="section-kicker">Маршрут сигнала</span><div class="mission-route">Земля → передающая антенна → выбранная звезда</div><p>После подтверждённого сеанса этот блок будет показывать фактические дату и время, антенну, направление, параметры пакета и статус передачи.</p><div class="transmission-status"><span class="status-pulse"></span><span><strong>Следующее окно передачи:</strong> появится только после технического согласования</span></div></div></div>`;
+    technology.insertAdjacentElement('afterend', mission);
+  }
+
+  const heroStatus = document.querySelector('.hero-copy .transmission-status > span:last-child');
+  if (heroStatus && heroStatus.textContent.includes('РТ-64')) heroStatus.remove();
+
+  const certCopy = document.querySelector('#certificate .certificate-copy');
+  if (certCopy) certCopy.innerHTML = `<span class="section-kicker">Главный цифровой артефакт</span><h2>Universe ID — космический паспорт желания</h2><p>Universe ID связывает весь путь в одну сущность: личное послание, EEG-отпечаток, выбранную цель, цифровой хеш и статус передачи. Сертификат — это визуальное подтверждение данных Universe ID.</p><ul class="check-list"><li>Уникальный ID сигнала</li><li>Текст и EEG-отпечаток момента</li><li>Координаты выбранной цели</li><li>SHA-256 для проверки целостности</li><li>Статус PREPARED → TRANSMITTED и фактические параметры сеанса</li></ul><button class="button button-outline js-open-builder" type="button">Оставить заявку</button>`;
+
+  const certificate = document.querySelector('#certificate');
+  if (certificate) {
+    const registry = document.createElement('section');
+    registry.className = 'section section-dark';
+    registry.id = 'registry';
+    registry.innerHTML = `<div class="container"><div class="test-side-layout reverse reveal"><div class="section-heading"><span class="section-kicker">После создания Universe ID</span><h2>Universe Registry</h2><p>Публичный реестр подтверждает существование сигнала, но не раскрывает личное содержание без согласия владельца.</p></div>${art('assets/test-registry.webp','Космический архив и реестр уникальных сигналов')}</div><div class="registry-card reveal"><div class="registry-row"><strong>UNV-DEMO-000184</strong><span>Москва → HD 20794</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000185</strong><span>Санкт-Петербург → TRAPPIST-1</span><span>PREPARED</span></div><div class="registry-row"><strong>UNV-DEMO-000186</strong><span>Казань → Polaris</span><span>DEMO</span></div></div></div>`;
+    certificate.insertAdjacentElement('afterend', registry);
+  }
+
+  const ctaCard = document.querySelector('.cta-section .cta-card');
+  if (ctaCard) {
+    const ctaCopy = ctaCard.querySelector('div:first-child');
+    if (ctaCopy) ctaCopy.innerHTML = '<span class="section-kicker">Первая передача формируется</span><h2>Оставьте заявку на участие в проекте</h2><p>Мы свяжемся с вами, расскажем о формате, сроках и следующих шагах. Само желание в заявке указывать не нужно.</p>';
+    ctaCard.insertAdjacentHTML('beforeend', art('assets/test-cta.webp','Личное послание начинает путь к звёздам'));
+  }
+
+  const applySideLayout = (selector, reverse = false) => {
+    const section = document.querySelector(selector);
+    if (!section) return;
+    const container = section.querySelector('.container');
+    const heading = section.querySelector('.section-heading');
+    const artEl = section.querySelector('.test-art');
+    if (!container || !heading || !artEl) return;
+    const layout = document.createElement('div');
+    layout.className = 'test-side-layout reveal' + (reverse ? ' reverse' : '');
+    container.insertBefore(layout, heading);
+    layout.appendChild(heading);
+    layout.appendChild(artEl);
+  };
+  applySideLayout('#formats', true);
+
+  const footerProject = document.querySelector('.footer-links > div:first-child');
+  if (footerProject) footerProject.innerHTML = '<strong>Проект</strong><a href="#how">Как работает</a><a href="#scenarios">Сценарии</a><a href="#formats">Форматы</a><a href="#technology">Технология</a>';
+
+  document.querySelectorAll('.js-package').forEach((button) => {
+    button.classList.remove('js-package');
+    button.classList.add('js-open-builder');
+  });
+  document.querySelectorAll('.js-open-builder').forEach((button) => {
+    button.textContent = button.dataset.gift === 'true' ? 'Заявка на подарок' : 'Оставить заявку';
+  });
+
+  const faqThird = document.querySelector('#faq .faq > details:nth-child(3)');
+  if (faqThird) faqThird.remove();
+
+  const modal = document.querySelector('#signal-modal');
+  if (modal) {
+    modal.innerHTML = `
+      <div class="modal-backdrop" data-close-modal></div>
+      <section class="builder" role="dialog" aria-modal="true" aria-labelledby="builder-title">
+        <button class="modal-close" type="button" aria-label="Закрыть" data-close-modal>×</button>
+        <div class="builder-header"><div><span class="section-kicker">Заявка на участие</span><h2 id="builder-title">Оставьте заявку</h2></div></div>
+        <form id="signal-form" class="application-form" novalidate>
+          <div class="builder-step active" data-step="1">
+            <div class="step-heading"><h3>Контактные данные</h3><p>Оставьте контакты — мы свяжемся с вами и уточним детали участия. Само желание здесь писать не нужно.</p></div>
+            <div class="form-grid">
+              <label class="field"><span>Имя</span><input id="participant-name" name="name" type="text" maxlength="60" placeholder="Например, Иван" required></label>
+              <label class="field"><span>Email</span><input id="participant-email" name="email" type="email" maxlength="100" placeholder="name@example.com" required></label>
+              <label class="field"><span>Телефон или Telegram</span><input id="participant-contact" name="contact" type="text" maxlength="100" placeholder="+7 ... или @username"></label>
+              <label class="field"><span>Формат участия</span><select id="application-format" name="format"><option value="personal">Для себя</option><option value="gift">В подарок</option><option value="event">Событие / бренд</option><option value="unknown">Пока не определился</option></select></label>
+              <label class="field field-full"><span>Комментарий</span><textarea id="application-comment" name="comment" maxlength="500" rows="5" placeholder="Например: хочу узнать о сроках, формате участия и стоимости."></textarea></label>
+            </div>
+            <p class="application-note">После заявки команда проекта свяжется с вами и отдельно согласует содержание будущего послания, EEG-сеанс и технические параметры передачи.</p>
+            <div class="application-status" id="application-status" aria-live="polite"></div>
+            <div class="builder-actions"><span></span><button class="button button-gradient" type="submit">Сформировать заявку</button></div>
+          </div>
+        </form>
+      </section>`;
+  }
+
+  const form = document.querySelector('#signal-form');
+  const format = document.querySelector('#application-format');
+  const status = document.querySelector('#application-status');
+
+  document.querySelectorAll('.js-open-builder').forEach((button) => {
+    button.addEventListener('click', () => {
+      setTimeout(() => {
+        if (!format) return;
+        if (button.dataset.gift === 'true') format.value = 'gift';
+        else if (button.dataset.applicationFormat === 'event') format.value = 'event';
+      }, 0);
+    });
+  });
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = document.querySelector('#participant-name')?.value.trim() || '';
+    const email = document.querySelector('#participant-email')?.value.trim() || '';
+    const contact = document.querySelector('#participant-contact')?.value.trim() || '';
+    const comment = document.querySelector('#application-comment')?.value.trim() || '';
+    const selectedFormat = format?.value || 'unknown';
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if (!name || !emailOk) {
+      if (status) status.textContent = !name ? 'Укажите имя.' : 'Проверьте адрес электронной почты.';
+      return;
+    }
+
+    const now = new Date();
+    const application = {
+      id: 'REQ-' + now.toISOString().slice(0,10).replaceAll('-', '') + '-' + Math.random().toString(36).slice(2,8).toUpperCase(),
+      createdAt: now.toISOString(),
+      name,
+      email,
+      contact,
+      format: selectedFormat,
+      comment,
+      source: 'spacewish.agency/'
+    };
+
+    try {
+      const saved = JSON.parse(localStorage.getItem('spacewishApplications') || '[]');
+      saved.unshift(application);
+      localStorage.setItem('spacewishApplications', JSON.stringify(saved.slice(0, 50)));
+    } catch (error) {
+      console.warn('Не удалось сохранить заявку локально', error);
+    }
+
+    form.innerHTML = '<div class="application-success"><span class="section-kicker">Заявка сформирована</span><h3>Спасибо, ' + name.replace(/[<>]/g, '') + '</h3><p>Контактные данные сохранены в этом браузере. Отправка в CRM или на корпоративную почту пока не подключена.</p></div>';
+  });
+
+  loadBaseScript();
 })();
