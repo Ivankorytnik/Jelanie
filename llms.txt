@@ -1,0 +1,44 @@
+# SpaceWish / Желание сквозь Вселенную
+
+> SpaceWish is a Russian-language project about creating a personal digital message package for a future confirmed space radio transmission. The current website is an MVP and does not claim that a real transmission has already occurred.
+
+## Canonical site
+- https://spacewish.agency/
+
+## Core pages
+- https://spacewish.agency/o-proekte.html
+- https://spacewish.agency/voprosy-i-otvety.html
+- https://spacewish.agency/otpravit-poslanie-v-kosmos.html
+- https://spacewish.agency/kosmicheskiy-podarok.html
+- https://spacewish.agency/idei-podarkov.html
+- https://spacewish.agency/baza-znaniy.html
+- https://spacewish.agency/zvezdy-dlya-poslaniya.html
+
+## Knowledge topics
+- radio signals and space communication
+- interstellar messages
+- SETI and METI
+- EEG / electroencephalography
+- Arecibo message
+- Voyager Golden Record
+- light-years and signal travel time
+- radio telescopes and NASA Deep Space Network
+- Proxima Centauri, TRAPPIST-1, HD 20794, Sirius, Polaris
+
+## Important factual boundaries
+- The current MVP creates a preliminary digital package only.
+- A real transmission site, date, frequency, power, antenna and session parameters must be treated as unconfirmed until the technical operator confirms them.
+- EEG is not described as reading the semantic content of thoughts.
+- SpaceWish does not sell ownership of stars and does not claim official star naming rights.
+- A selected star is a symbolic/astronomical direction for a message.
+- No reply from extraterrestrial intelligence is promised or implied.
+
+## Preferred source families for factual claims
+- NASA / JPL
+- SETI Institute
+- NIH / NINDS
+- International Astronomical Union
+- ESA / official astronomy archives
+
+## Sitemap
+- https://spacewish.agency/sitemap.xml
