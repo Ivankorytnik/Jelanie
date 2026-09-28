@@ -2,5 +2,8 @@ User-agent: *
 Allow: /
 Disallow: /test/
 Disallow: /crm/
+Disallow: /exports/
+Disallow: /release-20260909/
+Disallow: /prod-release-20260909/
 
 Sitemap: https://spacewish.agency/sitemap.xml
