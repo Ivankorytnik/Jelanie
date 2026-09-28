@@ -203,7 +203,7 @@
     });
   });
 
-  form?.addEventListener('submit', (event) => {
+  form?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = document.querySelector('#participant-name')?.value.trim() || '';
     const email = document.querySelector('#participant-email')?.value.trim() || '';
@@ -217,27 +217,44 @@
       return;
     }
 
-    const now = new Date();
-    const application = {
-      id: 'REQ-' + now.toISOString().slice(0,10).replaceAll('-', '') + '-' + Math.random().toString(36).slice(2,8).toUpperCase(),
-      createdAt: now.toISOString(),
-      name,
-      email,
-      contact,
-      format: selectedFormat,
-      comment,
-      source: 'spacewish.agency/'
-    };
+    const submitButton = form.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Отправляем...';
+    }
+    if (status) status.textContent = '';
 
     try {
-      const saved = JSON.parse(localStorage.getItem('spacewishApplications') || '[]');
-      saved.unshift(application);
-      localStorage.setItem('spacewishApplications', JSON.stringify(saved.slice(0, 50)));
-    } catch (error) {
-      console.warn('Не удалось сохранить заявку локально', error);
-    }
+      const response = await fetch('https://ytdacypygsfalkixhemj.functions.supabase.co/spacewish-leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          contact,
+          format: selectedFormat,
+          comment,
+          website: ''
+        })
+      });
 
-    form.innerHTML = '<div class="application-success"><span class="section-kicker">Заявка сформирована</span><h3>Спасибо, ' + name.replace(/[<>]/g, '') + '</h3><p>Контактные данные сохранены в этом браузере. Отправка в CRM или на корпоративную почту пока не подключена.</p></div>';
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) throw new Error(result.error || 'send failed');
+
+      form.innerHTML =
+        '<div class="application-success"><span class="section-kicker">Заявка отправлена</span><h3>Спасибо, ' +
+        name.replace(/[<>]/g, '') +
+        '</h3><p>Мы получили ваши контактные данные. Номер заявки: <strong>' +
+        String(result.request_id || '').replace(/[<>]/g, '') +
+        '</strong>. Команда проекта свяжется с вами.</p></div>';
+    } catch (error) {
+      console.error('Не удалось отправить заявку', error);
+      if (status) status.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз.';
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Сформировать заявку';
+      }
+    }
   });
 
   loadBaseScript();
