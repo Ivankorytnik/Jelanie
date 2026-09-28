@@ -1,0 +1,51 @@
+name: Submit sitemap URLs to IndexNow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "sitemap.xml"
+      - "*.html"
+      - "robots.txt"
+      - "llms.txt"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow-main
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for GitHub Pages deployment
+        run: sleep 30
+
+      - name: Extract URLs and submit to IndexNow
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEY="$(tr -d '\r\n' < 9126350b5ce698f256707cb3b7dcdab7.txt)"
+          KEY_LOCATION="https://spacewish.agency/9126350b5ce698f256707cb3b7dcdab7.txt"
+
+          mapfile -t URLS < <(grep -oP '(?<=<loc>)[^<]+' sitemap.xml)
+
+          if [ "${#URLS[@]}" -eq 0 ]; then
+            echo "No URLs found in sitemap.xml"
+            exit 1
+          fi
+
+          URL_LIST="$(printf '%s\n' "${URLS[@]}" | jq -R . | jq -s .)"
+          PAYLOAD="$(jq -n             --arg host "spacewish.agency"             --arg key "$KEY"             --arg keyLocation "$KEY_LOCATION"             --argjson urlList "$URL_LIST"             '{host:$host,key:$key,keyLocation:$keyLocation,urlList:$urlList}')"
+
+          echo "Submitting ${#URLS[@]} URLs to IndexNow"
+          curl --fail-with-body --silent --show-error             -X POST "https://api.indexnow.org/indexnow"             -H "Content-Type: application/json; charset=utf-8"             --data "$PAYLOAD"
+
+          echo
+          echo "IndexNow submission completed."
